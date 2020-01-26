@@ -1,0 +1,121 @@
+#
+# Affecter is a wrapper around a JSON object based dictionary of affects (see contents of the affect_rules directory for formatting details)
+# 
+# By default Affecter clamps the values of an Affect_Vector in the range of 0.0 to 1.0 and uses theatrical terminology, consistent with 
+# the default keys in gesture_keys.py inside of the actual_action_states dictionary in the Gesture_Interface class
+#
+# NOTE: WHICHEVER ACTION IS SPECIFIED AS equilibrium_action MUST HAVE A POSITIVE FLOAT VALUE ASSOCIATED WITH IT
+# OTHERWISE THE LOGIC MOVING THE AFFECT VALUES TOWARDS THE equilibrium_value WILL NOT FUNCTION PROPERLY
+#
+import json
+import random
+import math
+
+class Gesture_Affecter:
+    # affect_rules_name must take the form of '_filename_.json'
+    # affect_rules_directory must take the form of '_directoryname_/_directoryname_/.../_directoryname_/'
+    def __init__(self, affect_rules_name, affect_rules_directory, affect_floor = 0.0, affect_ceiling = 1.0, equilibrium_action = 'resting'):
+        with open(affect_rules_directory + affect_rules_name) as entry:
+            # affect_rules are organized as ['affect']['type']['action']
+            # NOTE 'type' is either 'actions' or 'modifiers'
+            # or ['affect']['adjacent_affects'] to get the adjacency list
+            self.affect_rules = json.load(entry)
+        self.floor_value = affect_floor
+        self.ceil_value = affect_ceiling
+        self.equilibrium_action = equilibrium_action
+        self.current_affect = self.affect_rules.keys()[0] # TODO do something more consistent and robust
+
+    # for use clamping the updated affect values between a given floor_value and ceil_value
+    def _update_and_clamp_values(self, affect_value, affect_update_value, floor_value, ceil_value):
+        return max(min(affect_value + affect_update_value, ceil_value), floor_value)
+    
+    # affect_vector is an Affect_Vector specified by class Affect_Vector in this file
+    # the floats correspond to the strength of the expressed affect
+    # current_action corresponds to the standard action expressed by a Gesture_Interface instance in its actual_action_states
+    # NOTE: clamps affect values between floor_value and ceil_value
+    # NOTE: while performing the equilibrium_action the affect values will move toward the equilibrium_value of the given affect_vector
+    def update_affect(self, affect_vector, current_action, current_modifier):
+        for affect in affect_vector.affects:
+            current_action_update_value = self.affect_rules[affect]['actions'][current_action]
+            current_modifier_update_value = self.affect_rules[affect]['modifiers'][current_modifier]
+            current_equilibrium_value = self.affect_rules[affect]['equilibrium_point']
+            
+            # move towards resting value specified in affect_vector when updating the action associated with the the 'equilibrium_action'
+            if current_action == self.equilibrium_action:
+                if affect_vector.affects[affect] > current_equilibrium_value:
+                    affect_vector.affects[affect] = self._update_and_clamp_values(affect_vector.affects[affect], -1 * abs(current_modifier_update_value * current_action_update_value), current_equilibrium_value, self.ceil_value)
+                elif affect_vector.affects[affect] < current_equilibrium_value:
+                    affect_vector.affects[affect] = self._update_and_clamp_values(affect_vector.affects[affect], abs(current_modifier_update_value * current_action_update_value), self.floor_value, current_equilibrium_value)
+                else:
+                    continue
+            else:
+                affect_vector.affects[affect] = self._update_and_clamp_values(affect_vector.affects[affect], current_modifier_update_value * current_action_update_value, self.floor_value, self.ceil_value)
+        return
+
+    # affect_vector must be an Affect_Vector
+    # returns a list of the affects with the highest strength of expression in the given affect_vector
+    # allowable_error is used for dealing with the approximate value of floats
+    def get_possible_affects(self, affect_vector, allowable_error = 0.00000001):
+        prevailing_affects = []
+        
+        for current_affect in affect_vector.affects:
+            if not prevailing_affects:
+                prevailing_affects.append(current_affect)
+            elif affect_vector.affects[prevailing_affects[0]] < affect_vector.affects[current_affect]:
+                prevailing_affects = []
+                prevailing_affects.append(current_affect)
+            # check if the affect magnitudes are approximately equal
+            elif abs(affect_vector.affects[prevailing_affects[0]] - affect_vector.affects[current_affect]) < allowable_error:
+                prevailing_affects.append(current_affect)
+            #print(current_affect, affect_vector.affects[current_affect])
+        #print(prevailing_affects)
+        return prevailing_affects
+
+    # chooses the next current affect
+    # possible_affects must be a list of strings of affects defined in the .json file loaded into the Affecter instance
+    # possible_affects can be generated using the get_possible_affects() function
+    # the choice logic is as follows:
+    #   pick the only available affect
+    #   if there is more than one and the current_affect is in the set of possible_affects pick it
+    #   if the current_affect is not in the set but there is at least one affect connected to the current affect, pick from that subset
+    #   otherwise randomly pick from the disconnected set of possible affects
+    def choose_prevailing_affect(self, possible_affects):
+        
+        connected_affects = []
+        
+        if len(possible_affects) == 1:
+            self.current_affect = possible_affects[0]
+            return self.current_affect
+
+        if self.current_affect in possible_affects:
+            return self.current_affect
+
+        for affect in possible_affects:
+            if affect in self.affect_rules[self.current_affect]['adjacent_affects']:
+                connected_affects.append(affect)
+                
+        if connected_affects:
+            self.current_affect = random.choice(connected_affects)
+            return self.current_affect
+        else:
+            self.current_affect = random.choice(possible_affects)
+            return self.current_affect
+        
+    # wrapper function around the get_possible_affects() to choose_prevailing_affect() pipeline to allow for easier, more fixed integration into other code
+    # NOTE: this function is not intended to supercede the useage of both get_possible_affects() and choose_prevailing_affect()
+    #       it is here for convenience and if the default behavior of immediately using the list created by get_possible_affects() in choose_prevailing_affect()
+    #       is the desired functionality
+    def get_prevailing_affect(self, affect_vector, allowable_error = 0.00000001):
+        possible_affects = self.get_possible_affects(affect_vector, allowable_error)
+        prevailing_affect = self.choose_prevailing_affect(possible_affects)
+        return prevailing_affect
+        
+# a wrapper around a python dictionary to organize affects and setup rules for handling the 'resting' action
+class Affect_Vector:
+    # affect_names takes a list of strings
+    def __init__(self, affect_names, equilibrium_values):
+        self.affects = {}
+        for affect in affect_names:
+            # dictionary with strings specifying affects (as defined in Affecter) as keys and floats as values
+            self.affects[affect] = equilibrium_values[affect]['equilibrium_point']
+            
