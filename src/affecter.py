@@ -4,9 +4,6 @@
 # By default Affecter clamps the values of an Affect_Vector in the range of 0.0 to 1.0 and uses theatrical terminology, consistent with 
 # the default keys in gesture_keys.py inside of the actual_action_states dictionary in the Gesture_Interface class
 #
-# NOTE: WHICHEVER ACTION IS SPECIFIED AS equilibrium_action MUST HAVE A POSITIVE FLOAT VALUE ASSOCIATED WITH IT
-# OTHERWISE THE LOGIC MOVING THE AFFECT VALUES TOWARDS THE equilibrium_value WILL NOT FUNCTION PROPERLY
-#
 import json
 import random
 import math
@@ -110,9 +107,10 @@ class Gesture_Affecter:
         prevailing_affect = self.choose_prevailing_affect(possible_affects)
         return prevailing_affect
         
-# a wrapper around a python dictionary to organize affects and setup rules for handling the 'resting' action
+# a wrapper around a python dictionary to organize affects
 class Affect_Vector:
     # affect_names takes a list of strings
+    # equilibrium_values is expected to be the rules stored in the affect_rules dictionary of a Gesture_Affecter
     def __init__(self, affect_names, equilibrium_values):
         self.affects = {}
         for affect in affect_names:
