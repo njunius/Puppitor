@@ -20,7 +20,7 @@ class Gesture_Affecter:
         self.floor_value = affect_floor
         self.ceil_value = affect_ceiling
         self.equilibrium_action = equilibrium_action
-        self.current_affect = self.affect_rules.keys()[0] # TODO do something more consistent and robust
+        self.current_affect = None # changed to None because this value will get updated immediately through the run loop (as long as you call update_affect()
 
     # for use clamping the updated affect values between a given floor_value and ceil_value
     def _update_and_clamp_values(self, affect_value, affect_update_value, floor_value, ceil_value):
