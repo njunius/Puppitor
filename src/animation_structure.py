@@ -13,7 +13,7 @@
 # the default values assume a 60Hz rate of calling update_displayed_frame() and a desired animation rate of 10FPS
 # 
 class Animation_Structure:
-    def __init__(self, frame_rate_delay = 5, modifier_list = ['tempo_up', 'tempo_down', 'neutral'], action_list = ['open_flow', 'closed_flow', 'projected_energy', 'resting'], affect_list = ['joy', 'anger', 'sadness', 'worry', 'love', 'fear']):
+    def __init__(self, frame_rate_delay = 5, frame_rate_map = {'tempo_up': 3, 'tempo_down': 5, 'neutral': 4}, modifier_list = ['tempo_up', 'tempo_down', 'neutral'], action_list = ['open_flow', 'closed_flow', 'projected_energy', 'resting'], affect_list = ['joy', 'anger', 'sadness', 'worry', 'love', 'fear']):
         
         # self.animation_frame_lists is a dictionary that uses modifiers to access actions to access individual frame lists
         self.animation_frame_lists = {}
@@ -53,13 +53,23 @@ class Animation_Structure:
                 self.frame_index_delineators[modifier][action] = {'startup': 0, 'loop': 1, 'final frame': 2} # default values to be swapped out after the Animation_Structure is built (use load_animation_list() to add frames)
         
         self.current_displayed_frame = None
-        
         self.current_animation_action = action_list[-1]
+        
         # used for switching over to a new animation corresponding to the current action the player is taking once the previous animation has finished
         self.reached_end_of_frame_list = False
+        
         # used for setting the frame rate of animations stored in this structure
         # default values assume an update rate of 60Hz creating an animation frame rate of 12FPS
+        # needs to be set to have a default value (or if you do not want to use the variable frame rate options this is the only value you need to change)
         self.frame_rate_delay = frame_rate_delay
+        
+        # self.frame_rate_delay_map is an optional feature to allow for variable frame rates mapped to specific actions, modifiers, and affects that the Animation_Structure is tracking
+        # passing frame_rate_map an empty dictionary will disable this feature
+        self.frame_rate_delay_map = {}
+        for act_mod in frame_rate_map:
+            self.frame_rate_delay_map[act_mod] = frame_rate_map[act_mod]
+        print(self.frame_rate_delay_map)
+        
         # internal counter for advancing the frame rate delay
         self.frame_rate_delay_count = 0
         
@@ -84,10 +94,18 @@ class Animation_Structure:
     # this is primarily a book keeping function meant to allow a persistent
     # should be returning a Sprite if used with RenPy
     def update_displayed_frame(self, modifier, action, affect):
+        # optional variable frame rate feature
+        if self.frame_rate_delay_map:
+            if modifier in self.frame_rate_delay_map:
+                self.frame_rate_delay = self.frame_rate_delay_map[modifier]
+            elif action in self.frame_rate_delay_map:
+                self.frame_rate_delay = self.frame_rate_delay_map[action]
+            elif affect in self.frame_rate_delay_map:
+                self.frame_rate_delay = self.frame_rate_delay_map[affect]
+        
         if self.frame_rate_delay_count < self.frame_rate_delay:
             self.frame_rate_delay_count += 1
         else:
-            #self.displayed_frame_data = (modifier, self.current_animation_action, affect, self.current_frames[modifier][self.current_animation_action])
             for mod in self.animation_frame_lists:
                 # skip to returning to resting if the player has changed the energy state
                 if self.current_animation_action != action:
