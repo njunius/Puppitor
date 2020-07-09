@@ -2,7 +2,9 @@ import affecter
 import gesture_keys
 import animation_structure
 
-test_affecter = affecter.Gesture_Affecter('test_passions_rules.json','./affect_rules/')
+test_rule_file = open('affect_rules/test_passions_rules.json', 'r')
+
+test_affecter = affecter.Gesture_Affecter(test_rule_file)
 test_anim_struct = animation_structure.Animation_Structure(4)
 test_affect_vector = affecter.Affect_Vector(test_affecter.affect_rules.keys(), test_affecter.affect_rules)
 

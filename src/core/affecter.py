@@ -9,18 +9,25 @@ import random
 import math
 
 class Gesture_Affecter:
-    # affect_rules_name must take the form of '_filename_.json'
-    # affect_rules_directory must take the form of '_directoryname_/_directoryname_/.../_directoryname_/'
-    def __init__(self, affect_rules_name, affect_rules_directory, affect_floor = 0.0, affect_ceiling = 1.0, equilibrium_action = 'resting'):
-        with open(affect_rules_directory + affect_rules_name) as entry:
-            # affect_rules are organized as ['affect']['type']['action']
-            # NOTE 'type' is either 'actions' or 'modifiers'
-            # or ['affect']['adjacent_affects'] to get the adjacency list
-            self.affect_rules = json.load(entry)
+    def __init__(self, affect_rules_file, affect_floor = 0.0, affect_ceiling = 1.0, equilibrium_action = 'resting'):
+        # affect_rules_file must be a valid open file with the following format:
+        # ['affect']['type']['action']
+        # NOTE 'type' is either 'actions' or 'modifiers'
+        # each ['action'] has a corresponding update value
+        # ['affect']['adjacent_affects'] contains a list of other valid affect names that are used to create a directed graph of emotional affects for a character
+        # ['affect']['equilibrium_point'] is the value that affect tends towards when performing the specified equilibrium_action
+        self.affect_rules = json.load(affect_rules_file)
+
         self.floor_value = affect_floor
         self.ceil_value = affect_ceiling
         self.equilibrium_action = equilibrium_action
         self.current_affect = None # changed to None because this value will get updated immediately through the run loop (as long as you call update_affect()
+
+    # discards the stored affect_rules and replaces it with a new rule_file in the above JSON format
+    def load_open_rule_file(self, affect_rule_file):
+        self.affect_rules = None
+        self.affect_rules = json.load(affect_rule_file)
+        return
 
     # for use clamping the updated affect values between a given floor_value and ceil_value
     def _update_and_clamp_values(self, affect_value, affect_update_value, floor_value, ceil_value):

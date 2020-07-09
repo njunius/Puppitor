@@ -6,11 +6,10 @@
 import json
 
 class Punctuation_Printout_Rules:
-    def __init__(self, punctuation_rules_name, punctuation_rules_directory):
-        # load the specified punctuation rule file
-        with open(punctuation_rules_directory + punctuation_rules_name) as entry:
-            # punctuation rules are organized as [punctuation] as keys and [semantic tag] as values 
-            self.punctuation_rules = json.load(entry)
+    def __init__(self, punctuation_rules_file):
+        # load the opened specified punctuation rule file
+        # punctuation rules are organized as [punctuation] as keys and [semantic tag] as values 
+        self.punctuation_rules = json.load(punctuation_rules_file)
             
         self.multi_character_punctuation = []
         
@@ -22,7 +21,6 @@ class Punctuation_Printout_Rules:
         
         print(self.punctuation_rules.keys())
         print(self.multi_character_punctuation)
-           
            
     # thank you to Max Kreminski for hammering out a tokenizer and emitter for fun that I could then go and butcher
     

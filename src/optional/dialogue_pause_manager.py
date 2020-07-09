@@ -1,5 +1,6 @@
-
-
+#
+# Dialogue_Pause_Manager is a small helper class used to track state information if dynamic pausing of dialogue printout is part of the game loop
+#
 class Dialogue_Pause_Manager:
     def __init__(self, defined_afm_time, in_line_afm_time = 2):
         # should be Ren'Py auto forward time stored in the preferences
@@ -17,3 +18,6 @@ class Dialogue_Pause_Manager:
         
         # counter for tracking where in a line the player has gotten to
         self.num_words_said = 0
+        
+        # dictionary to store character name colors for use with dialogue
+        self.character_colors = {}
