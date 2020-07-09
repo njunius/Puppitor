@@ -2,7 +2,7 @@ import scene_parser
 
 scene_dict = {}
 
-scene_memory = open('Scene1D3.txt', 'r')
+scene_memory = open('smallscene.txt', 'r')
 
 test_parser = scene_parser.Scene_Parser(scene_memory)
 print()
