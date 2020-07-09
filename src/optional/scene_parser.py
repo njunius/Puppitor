@@ -6,7 +6,7 @@
 # NOTE: if there is any non-alphanumeric character THAT IS NOT A '(' in the first character of a line in the script IT WILL BE IGNORED BY THE PARSER
 # 
 class Scene_Parser:
-    def __init__(self, scene_script, stage_directions = False):
+    def __init__(self, scene_script, stage_directions = False, stage_directions_character = ''):
         
         # flag for determining whether to include stage directions in the processed scene
         self.stage_directions = stage_directions
@@ -15,6 +15,7 @@ class Scene_Parser:
         # ('<character name>', '<character dialogue>')
         self.processed_scene = []
         self.num_lines_processed = 0
+        self.stage_directions_character = stage_directions_character
         
         # the scene as read directly from the file opened and passed in as scene_script
         # local variable since this information is not useful in future usage at this time and takes up memory
@@ -34,7 +35,7 @@ class Scene_Parser:
             # use '(' as a marker for stage directions and add it to the processed scene if the parser is processing stage directions
             # otherwise only add lines with the format '<character name>: <dialogue>'
             if line[0] == '(' and self.stage_directions:
-                self.processed_scene.append(('',line))
+                self.processed_scene.append((stage_directions_character,line))
             elif line[0].isalpha() or line[0].isdigit():
                 split_line = line.split(': ')
                 self.processed_scene.append((split_line[0], split_line[1]))
