@@ -19,14 +19,15 @@ class Scene_Parser:
         # the scene as read directly from the file opened and passed in as scene_script
         # local variable since this information is not useful in future usage at this time and takes up memory
         scene_script_raw = scene_script.readlines()
-        
         # the scene with all the empty line breaks removed and leading and trailing whitespace removed
         # local variable since this information is not useful in future usage at this time and takes up memory
         script_new_line_culled = []
-        
+
         for line in scene_script_raw:
-            if line != '\n':
-                script_new_line_culled.append(line.strip())
+            # strip the line to make cross-platform detection of an empty line simpler
+            stripped_line = line.strip()
+            if stripped_line != '':
+                script_new_line_culled.append(stripped_line)
 
         # process the stripped line into the ('<character name>', '<character dialogue>') tuple format
         for line in script_new_line_culled:
