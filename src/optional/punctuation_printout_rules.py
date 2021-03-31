@@ -10,17 +10,10 @@ class Punctuation_Printout_Rules:
         # load the opened specified punctuation rule file
         # punctuation rules are organized as [punctuation] as keys and [semantic tag] as values 
         self.punctuation_rules = json.load(punctuation_rules_file)
-            
-        self.multi_character_punctuation = []
-        
-        for punctuation in self.punctuation_rules.keys():
-            if len(punctuation) > 1:
-                self.multi_character_punctuation.append(punctuation)
-        
+                    
         self.num_insertions = 0
         
         print(self.punctuation_rules.keys())
-        print(self.multi_character_punctuation)
            
     # thank you to Max Kreminski for hammering out a tokenizer and emitter for fun that I could then go and butcher
     
@@ -34,7 +27,8 @@ class Punctuation_Printout_Rules:
         while index < len(input_str):
             # go through the input string and if we see a character or string that is in the insert rules we say we have found a new special
             matching_special = next((curr_spec for curr_spec in specials if input_str[index:index+len(curr_spec)] == curr_spec), None)
-            if matching_special:
+            # added a check to see if the matching_special is the last character in the line so there are not extraneous pauses at the end of printing lines
+            if matching_special and index + len(matching_special) < len(input_str) - 1:
                 # append curr_plain_str token to tokens first (and start a new curr_plain_str)
                 # note: we do this unconditionally, so we emit garbage PLAIN empty string tokens between two specials
                 # (but it shouldn't matter for our current usecase)
@@ -73,62 +67,4 @@ class Punctuation_Printout_Rules:
         result_string = self.emit(tokens, self.punctuation_rules)
         
         return result_string
-    
-    # takes a string and inserts semantic tags after each type of punctuation tracked by the rules
-    # file stored in self.punctuation_rules
-    # returns a new string with the semantic rules added after the punctuation they are associated with
-    """def apply_rules(self, given_string):
-        result_string = ''
-        str_len = len(given_string)
-        index = 0
-        single_punct_skip_count = 0
-        while index < str_len:        
-            character = given_string[index]
-            
-            if self.multi_character_punctuation:
-                # check if the character we are looking at could be a part of a multi-character punctuation
-                for punctuation in self.multi_character_punctuation:
-                    pnct_length = len(punctuation)
-                    
-                    # try the next multi-character piece of punctuation if we are not comparing the correct one
-                    if character not in punctuation:
-                        single_punct_skip_count += 1
-                        continue
-                    else:
-                        if index <= str_len - pnct_length:
-                            # use index + len(punctuation) - 1 because index is the first element in a multi-character punctuation
-                            # if we are not actually looking at a multi-character piece of punctuation
-                            # because what would be its final character does not match, just add the character
-                            if given_string[index + pnct_length - 1] not in punctuation:
-                                result_string += character + self.punctuation_rules[character]
-                            else:
-                                while index < str_len and given_string[index] in punctuation:
-                                    index += 1
-                                result_string += punctuation + self.punctuation_rules[punctuation]
-                                index -= 1 # the outermost while loop will overshoot the next character by 1 so we need to reset it
-                
-                # if we were actually looking at a piece of single character punctuation
-                if single_punct_skip_count == len(self.multi_character_punctuation) and character in self.punctuation_rules:
-                    result_string += character + self.punctuation_rules[character]
-                # or were not looking at a piece of punctuation at all
-                elif character not in self.punctuation_rules:
-                    char_in_punct = False
-                    # make sure we aren't adding a redundant part of the multi-character punctuation
-                    for multi_char_punct in self.multi_character_punctuation:
-                        if character in multi_char_punct:
-                            char_in_punct = True
-                            break                    
-                    if not char_in_punct:
-                        result_string += character
-                
-                single_punct_skip_count = 0
-                                    
-            else:
-                if character in self.punctuation_rules:
-                    result_string += character + self.punctuation_rules[character]
-                else:
-                    result_string += character
-            
-            index += 1
-        return result_string"""
-            
+        

@@ -35,7 +35,7 @@ class Scene_Parser:
             # use '(' as a marker for stage directions and add it to the processed scene if the parser is processing stage directions
             # otherwise only add lines with the format '<character name>: <dialogue>'
             if line[0] == '(' and self.stage_directions:
-                self.processed_scene.append((stage_directions_character,line))
+                self.processed_scene.append((stage_directions_character,line[1:-1]))
             elif line[0].isalpha() or line[0].isdigit():
                 split_line = line.split(': ')
                 self.processed_scene.append((split_line[0], split_line[1]))
