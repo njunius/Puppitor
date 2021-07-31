@@ -6,7 +6,7 @@
 # NOTE: if there is any non-alphanumeric character THAT IS NOT A '(' in the first character of a line in the script IT WILL BE IGNORED BY THE PARSER
 # 
 class Scene_Parser:
-    def __init__(self, scene_script, stage_directions = False, stage_directions_character = ''):
+    def __init__(self, scene_script, stage_directions = False, stage_directions_character = '', stage_directions_parenthesis = True):
         
         # flag for determining whether to include stage directions in the processed scene
         self.stage_directions = stage_directions
@@ -34,16 +34,19 @@ class Scene_Parser:
         for line in script_new_line_culled:
             # use '(' as a marker for stage directions and add it to the processed scene if the parser is processing stage directions
             # otherwise only add lines with the format '<character name>: <dialogue>'
-            if line[0] == '(' and self.stage_directions:
-                self.processed_scene.append((stage_directions_character,line[1:-1]))
-            elif line[0].isalpha() or line[0].isdigit():
+            
+            first_character = line[0]
+            
+            if first_character == '(' and self.stage_directions and stage_directions_parenthesis:
+                self.processed_scene.append((stage_directions_character, line)) 
+            elif first_character == '(' and self.stage_directions:
+                self.processed_scene.append((stage_directions_character, line[1:-1])) # put [1:-1] with line to cut off the parenthesis
+            elif first_character.isalpha() or first_character.isdigit():
                 split_line = line.split(': ')
                 self.processed_scene.append((split_line[0], split_line[1]))
                 
         self.num_lines_processed = len(self.processed_scene)
         
-        print(self.processed_scene)
-        print(self.num_lines_processed)
         
     # returns the tuple of ('<character name>', '<line of dialogue>') representing the line with the specified number in the scene
     def get_scene_line(self, line_num):
