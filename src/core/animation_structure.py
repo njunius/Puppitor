@@ -90,6 +90,24 @@ class Animation_Structure:
     def get_displayed_frame(self):
         return self.current_displayed_frame
         
+    def _skip_to_end_of_animation(self, current_modifier):
+        
+        self.current_frames[current_modifier][self.current_animation_action] += 1
+        
+        if self.current_frames[current_modifier][self.current_animation_action] > self.frame_index_delineators[current_modifier][self.current_animation_action]['final frame']:
+            self.current_frames[current_modifier][self.current_animation_action] = 0
+            self.reached_end_of_frame_list = True
+        
+        return
+        
+    def _increment_and_loop_animation(self, current_modifier):
+        
+        self.current_frames[current_modifier][self.current_animation_action] += 1
+        if self.current_frames[current_modifier][self.current_animation_action] > self.frame_index_delineators[current_modifier][self.current_animation_action]['loop']:
+            self.current_frames[current_modifier][self.current_animation_action] = self.frame_index_delineators[current_modifier][self.current_animation_action]['startup'] + 1  # return to first frame of the loop
+        
+        return
+        
     # returns the next frame in an animation sequence as well as the previous frame
     # this is primarily a book keeping function meant to allow a persistent
     # should be returning a Sprite if used with RenPy
@@ -107,32 +125,31 @@ class Animation_Structure:
             self.frame_rate_delay_count += 1
         else:
             for mod in self.animation_frame_lists:
+            
+                index_of = self.current_frames[mod]
+                index_of_end_of_startup = self.frame_index_delineators[mod][self.current_animation_action]['startup']
+                index_of_end_of_loop = self.frame_index_delineators[mod][self.current_animation_action]['loop']
+                index_of_end_animation = self.frame_index_delineators[mod][self.current_animation_action]['final frame']
+            
                 # skip to returning to resting if the player has changed the energy state
                 if self.current_animation_action != action:
-                    if self.current_frames[mod][self.current_animation_action] < self.frame_index_delineators[mod][self.current_animation_action]['loop']:
-                        self.current_frames[mod][self.current_animation_action] = self.frame_index_delineators[mod][self.current_animation_action]['loop'] + 1
+                    if index_of[self.current_animation_action] <= index_of_end_of_loop:
+                        index_of[self.current_animation_action] = index_of_end_of_loop + 1
                     else:
-                        self.current_frames[mod][self.current_animation_action] += 1
-                        if self.current_frames[mod][self.current_animation_action] > self.frame_index_delineators[mod][self.current_animation_action]['final frame']:
-                            self.current_frames[mod][self.current_animation_action] = 0
-                            self.reached_end_of_frame_list = True
+                        self._skip_to_end_of_animation(mod)
+                
                 # startup animation
-                elif self.current_frames[mod][self.current_animation_action] < self.frame_index_delineators[mod][self.current_animation_action]['startup']:
-                    self.current_frames[mod][self.current_animation_action] += 1
+                elif index_of[self.current_animation_action] < index_of_end_of_startup:
+                    index_of[self.current_animation_action] += 1
+                
                 # loop animation 
-                elif self.current_frames[mod][self.current_animation_action] <= self.frame_index_delineators[mod][self.current_animation_action]['loop']:
-                    if self.current_animation_action != action:
-                        self.current_frames[mod][self.current_animation_action] = self.frame_index_delineators[mod][self.current_animation_action]['loop'] + 1
-                    else:
-                        self.current_frames[mod][self.current_animation_action] += 1
-                        if self.current_frames[mod][self.current_animation_action] > self.frame_index_delineators[mod][self.current_animation_action]['loop']:
-                            self.current_frames[mod][self.current_animation_action] = self.frame_index_delineators[mod][self.current_animation_action]['startup'] + 1  # return to first frame of the loop
+                elif index_of[self.current_animation_action] <= index_of_end_of_loop:               
+                    self._increment_and_loop_animation(mod)
+                
                 # return to default animation
-                elif self.current_frames[mod][self.current_animation_action] <= self.frame_index_delineators[mod][self.current_animation_action]['final frame']:
-                    self.current_frames[mod][self.current_animation_action] += 1
-                    if self.current_frames[mod][self.current_animation_action] > self.frame_index_delineators[mod][self.current_animation_action]['final frame']:
-                        self.current_frames[mod][self.current_animation_action] = 0
-                        self.reached_end_of_frame_list = True
+                elif index_of[self.current_animation_action] <= index_of_end_animation:
+                    self._skip_to_end_of_animation(mod)
+
 
             if self.reached_end_of_frame_list:
                 self.current_animation_action = action
@@ -140,6 +157,7 @@ class Animation_Structure:
             else:
                 self.current_animation_action = self.current_animation_action
             self.frame_rate_delay_count = 0
+            
         self.current_displayed_frame = self.animation_frame_lists[modifier][self.current_animation_action][affect][self.current_frames[modifier][self.current_animation_action]]
-        return(self.animation_frame_lists[modifier][self.current_animation_action][affect][self.current_frames[modifier][self.current_animation_action]])
+        return(self.current_displayed_frame)
         
