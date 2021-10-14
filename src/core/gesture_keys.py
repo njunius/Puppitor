@@ -10,78 +10,70 @@
 # modifiers update independently from actions
 # actions update independently from modifiers
 #
-# the Gesture_Interface class ASSUMES THE FIRST ITEM OF action_states IS THE DEFAULT AND CURRENT ACTION AT INITIALIZATION TIME
-# the Gesture_Interface class ASSUMES THE LAST ITEM OF modifier_states IS THE DEFAULT AND CURRENT MODIFIER AT INITIALIZATION TIME
-#
-# action_states and modifier_states cannot have any shared values
-#
-# buttons takes pygame key and button values
-# Gesture_Interface assumes that the first M items in buttons correspond to the items in action_states where M is the number of items - 1 in action_states
-# Gesture_Interface assumes that the last N items in buttons correspond to the items in modifier states where N is the number of items - 1 in modifier_states
-#
 import pygame
 
 class Gesture_Interface:
-    def __init__(self, action_states = ['resting', 'open_flow', 'closed_flow', 'projected_energy'], modifier_states = ['tempo_up', 'tempo_down', 'neutral'], cadence_actions = ['pause'], buttons = [pygame.K_SPACE, 3, 1, pygame.K_LSHIFT, pygame.K_LCTRL, pygame.K_q]):
-        """self.keymap = { 
-                        'open_flow' : [pygame.K_SPACE],
-                        'closed_flow' : [3], # references right mouse button
-                        'projected_energy' : [1], # references left mouse button
-                        'tempo_up' : [pygame.K_LSHIFT],
-                        'tempo_down' : [pygame.K_LCTRL],
-                        'pause' : [pygame.K_q]
-                      }"""
-                      
-        for action in action_states:
-            if action in modifier_states or action in cadence_actions:
-                print('usage: you cannot have an action that is also a modifier or cadence')
-                return
+    
+    def __init__(self, key_map, default_action = 'resting', default_modifier = 'neutral'):
         
-        if len(action_states) - 1 + len(modifier_states) - 1 + len(cadence_actions) != len(buttons):
-            print('usage: there must be a key or button bound to each non default action or modifier')
+        # ALL must have a value corresponding to a key in the actual_action_states dictionary of actions or modifiers
+        # for the current usage both the current and default actions are initialized to the first value in the actions list 
+        # for the current usage both the current and default modifiers are initialized to the last value in the modifiers list
         
-        self.keymap = {}
-        # skips assigning the first element of action states to a key because this is the default action
-        for i in range(1, len(action_states)):
-            self.keymap[action_states[i]] = [buttons[i - 1]]
+        # this dictionary and values should not be modified ever and are generally for internal use only
+        self._default_states = {
+                                'actions' : default_action,
+                                'modifiers' : default_modifier
+                              }
+        # this dictionary and values should only be modified internally and are used to access the current
+        # state of the actions being performed 
+        self.current_states = {
+                                'actions' : self._default_states['actions'],
+                                'modifiers' : self._default_states['modifiers']
+                              }
+        # example keymap
+        # NOTE THAT THE KEYMAP SHOULD BE USING LISTS FOR KEYS TO ALLOW FOR THE POSSIBILITY OF MULTIPLE KEYS PERFORMING THE SAME ACTION
+        """self.keymap = {
+                            'actions': { 
+                                'open_flow': [pygame.K_n], 
+                                'closed_flow': [pygame.K_m], 
+                                'projected_energy': [pygame.K_b]
+                            },
+                            'modifiers': {
+                                'tempo_up': [pygame.K_c],
+                                'tempo_down': [pygame.K_z]
+                            }
+                         }"""
         
-        # skips assigning the last element of modifier states to a key because this is the default modifier state
-        for i in range(0, len(modifier_states) - 1):
-            self.keymap[modifier_states[i]] = [buttons[i + len(action_states) - 1]]
+        self.keymap = key_map
         
-        # add any cadence_actions to the keymap
-        for i in range(0, len(cadence_actions)):
-            self.keymap[cadence_actions[i]] = [buttons[i + len(action_states) - 1 + len(modifier_states) - 1]]
-        
-        print(self.keymap)
+        print('\nkeymap:\n', self.keymap)
         
         # flags corresponding to actions being specified by the user input
         # FOR INPUT DETECTION USE ONLY
-        # MULTIPLE ACTIONS, MODIFIER STATES, AND CADENCES CAN BE TRUE
+        # MULTIPLE ACTIONS AND MODIFIER STATES CAN BE TRUE
         """self.possible_action_states = {
                         'open_flow' : False,
                         'closed_flow' : False,
                         'projected_energy' : False,
                         'tempo_up' : False,
                         'tempo_down' : False
-                        'pause' : False
                       }"""
         self.possible_action_states = {}
-        for i in range(1, len(action_states)):
-            self.possible_action_states[action_states[i]] = False
-        for i in range(0, len(modifier_states) - 1):
-            self.possible_action_states[modifier_states[i]] = False
-        for i in range(0, len(cadence_actions)):
-            self.possible_action_states[cadence_actions[i]] = False
             
-        print(self.possible_action_states)
+        for action in self.keymap['actions']:
+            self.possible_action_states[action] = False
+            
+        for modifier in self.keymap['modifiers']:
+            self.possible_action_states[modifier] = False
+            
+        print('\npossible action states:\n', self.possible_action_states)
         # flags used for specifying the current state of actions for use in updating a character's physical affect
         # FOR SEMANTIC USE
-        # ONLY ONE ACTION, MODIFIER STATE AND CADENCE CAN BE TRUE
+        # ONLY ONE ACTION AND MODIFIER STATE CAN BE TRUE
         """self.actual_action_states = {
                         'actions' : {'resting' : True, 'open_flow' : False, 'closed_flow' : False, 'projected_energy' : False},
                         'modifiers' : {'tempo_up' : False, 'tempo_down' : False, 'neutral' : True}
-                        'cadences' : {'pause' : False} 
                         #'resting' : True, # the default action (should be set to True when no other non-modifier states are true)
                         #'open_flow' : False, # an action
                         #'closed_flow' : False, # an action
@@ -90,54 +82,25 @@ class Gesture_Interface:
                         #'tempo_down' : False # a modifier state
                         # 'pause' : False # a cadence action
                       }"""
-        # cadences behave differently in that their default state is always False
-        # this is due to them not bein connected directly to the affect update cyle
-        # and they are designed to be more direct feedback actions than the actions
-        # and modifiers
         self.actual_action_states = {
                                       'actions' : {},
-                                      'modifiers' : {},
-                                      'cadences': {}
+                                      'modifiers' : {}
                                     }
         for category in self.actual_action_states:
             if category == 'actions':
-                for i in range(0, len(action_states)):
-                    if i == 0:
-                        self.actual_action_states['actions'][action_states[i]] = True
-                    else:
-                        self.actual_action_states['actions'][action_states[i]] = False
+                self.actual_action_states['actions'][default_action] = True
+                for action in self.keymap['actions']:
+                    self.actual_action_states['actions'][action] = False
+            
             if category == 'modifiers':
-                for i in range(0, len(modifier_states)):
-                    if i == len(modifier_states) - 1:
-                        self.actual_action_states['modifiers'][modifier_states[i]] = True
-                    else:
-                        self.actual_action_states['modifiers'][modifier_states[i]] = False    
-            if category == 'cadences':
-                for i in range(0, len(cadence_actions)):
-                    self.actual_action_states['cadences'][cadence_actions[i]] = False
-                    
-        print(self.actual_action_states)
+                self.actual_action_states['modifiers'][default_modifier] = True
+                for modifier in self.keymap['modifiers']:
+                    self.actual_action_states['modifiers'][modifier] = False
+                        
+        print('\nactual action states:\n', self.actual_action_states)
         
         # allows toggling of keys rather than press and hold when true
         self.toggle = False
-
-        # ALL must have a value corresponding to a key in the actual_action_states dictionary of actions or modifiers
-        # for the current usage both the current and default actions are initialized to the first value in the actions list 
-        # for the current usage both the current and default modifiers are initialized to the last value in the modifiers list
-        
-        # this dictionary and values should not be modified ever and are generally for internal use only
-        self._default_states = {
-                                'actions' : action_states[0],
-                                'modifiers' : modifier_states[-1],
-                                'cadences' : None
-                              }
-        # this dictionary and values should only be modified internally and are used to access the current
-        # state of the actions being performed 
-        self.current_states = {
-                                'actions' : self._default_states['actions'],
-                                'modifiers' : self._default_states['modifiers'],
-                                'cadences' : self._default_states['cadences']
-                              }
         
     # USED FOR UPDATING BASED ON KEYBOARD INPUTS
     # updates a specified state to a new boolean value
@@ -150,7 +113,6 @@ class Gesture_Interface:
     # updates a specified action or modifier to a new boolean value
     # UPDATING AN ACTION WILL SET ALL OTHER ACTIONS TO FALSE
     # UPDATING A MODIFIER WILL SET ALL OTHER MODIFIERS TO FALSE
-    # UPDATING A CADENCE WILL SET ALL OTHER CADENCES TO FALSE
     #
     # MODIFERS, ACTIONS, AND CADENCES ARE ASSUMED TO BE MUTUALLY EXCLUSIVE WHEN UPDATING
     def update_actual_states(self, state_to_update, class_of_action, new_value):
@@ -167,10 +129,9 @@ class Gesture_Interface:
                 else:
                     self.actual_action_states[class_of_action][state] = False
             if new_value == False:
-                # return to doing the default behavior and check that we are not updating a cadence because cadence default state is None
+                # return to doing the default behavior
                 self.current_states[class_of_action] = self._default_states[class_of_action]
-                if class_of_action is not 'cadences':
-                    self.actual_action_states[class_of_action][self._default_states[class_of_action]] = True
+                self.actual_action_states[class_of_action][self._default_states[class_of_action]] = True
             return
         else:
             print('state: ' + state_to_update + ' is not a type of ' + class_of_action)

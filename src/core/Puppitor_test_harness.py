@@ -8,7 +8,19 @@ test_affecter = affecter.Gesture_Affecter(test_rule_file)
 test_anim_struct = animation_structure.Animation_Structure(4)
 test_affect_vector = affecter.make_affect_vector(test_affecter.affect_rules.keys(), test_affecter.affect_rules)
 
-test_gesture_keys_obj = gesture_keys.Gesture_Interface()
+keymap = {
+                'actions': { 
+                    'open_flow': ['pygame.K_n'], 
+                    'closed_flow': ['pygame.K_m'], 
+                    'projected_energy': ['pygame.K_b']
+                },
+                'modifiers': {
+                    'tempo_up': ['pygame.K_c'],
+                    'tempo_down': ['pygame.K_z']
+                }
+           }
+
+test_gesture_keys_obj = gesture_keys.Gesture_Interface(keymap)
 
 test_gesture_keys_obj.update_possible_states('open_flow', True)
 test_gesture_keys_obj.update_possible_states('tempo_up', True)
