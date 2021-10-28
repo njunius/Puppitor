@@ -1,5 +1,5 @@
 import affecter
-import gesture_keys
+import action_key_map
 import animation_structure
 
 test_rule_file = open('affect_rules/test_passions_rules.json', 'r')
@@ -20,7 +20,7 @@ keymap = {
                 }
            }
 
-test_gesture_keys_obj = gesture_keys.Gesture_Interface(keymap)
+test_gesture_keys_obj = action_key_map.Action_Key_Map(keymap)
 
 test_gesture_keys_obj.update_possible_states('open_flow', True)
 test_gesture_keys_obj.update_possible_states('tempo_up', True)

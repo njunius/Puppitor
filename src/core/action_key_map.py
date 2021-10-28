@@ -12,7 +12,7 @@
 #
 import pygame
 
-class Gesture_Interface:
+class Action_Key_Map:
     
     def __init__(self, key_map, default_action = 'resting', default_modifier = 'neutral'):
         
