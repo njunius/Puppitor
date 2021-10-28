@@ -1,11 +1,9 @@
 import affecter
 import action_key_map
-import animation_structure
 
 test_rule_file = open('affect_rules/test_passions_rules.json', 'r')
 
-test_affecter = affecter.Gesture_Affecter(test_rule_file)
-test_anim_struct = animation_structure.Animation_Structure(4)
+test_affecter = affecter.Affecter(test_rule_file)
 test_affect_vector = affecter.make_affect_vector(test_affecter.affect_rules.keys(), test_affecter.affect_rules)
 
 keymap = {
