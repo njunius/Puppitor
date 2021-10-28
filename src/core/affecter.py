@@ -8,7 +8,7 @@ import json
 import random
 import math
 
-class Gesture_Affecter:
+class Affecter:
     def __init__(self, affect_rules_file, affect_floor = 0.0, affect_ceiling = 1.0, equilibrium_action = 'resting'):
         # affect_rules_file must be a valid open file with the following format:
         # ['affect']['type']['action']

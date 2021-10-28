@@ -10,7 +10,6 @@
 # modifiers update independently from actions
 # actions update independently from modifiers
 #
-import pygame
 
 class Action_Key_Map:
     
