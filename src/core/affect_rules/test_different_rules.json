@@ -1,0 +1,146 @@
+{
+    "hatred" : {
+            "actions" : {
+                "sulk" : 0.7,
+                "stand" : -0.5,
+                "sit" : -0.2,
+                "cross_legs" : -0.1,
+                "cross_arms" : 0.5,
+                "lean_forward" : 0.2
+            },
+            "modifiers" : {
+                "casually" : 1.25,
+                "threateningly" : 0.9,
+                "openly" : 1.0,
+                "worriedly" : 0.8
+            },        
+        "adjacent_affects" : ["paranoia"],
+        "equilibrium_point" : 0.5
+    },
+    "adoration" : {
+        "actions" : {
+                "sulk" : -0.07,
+                "stand" : 0.05,
+                "sit" : 0.02,
+                "cross_legs" : 0.01,
+                "cross_arms" : 0.05,
+                "lean_forward" : 0.02
+            },
+            "modifiers" : {
+                "casually" : 1.3,
+                "threateningly" : 0.7,
+                "openly" : 1.0,
+                "worriedly" : 0.9
+            },
+        "adjacent_affects" : ["appreciation"],
+        "equilibrium_point" : 0.5
+    },
+    "paranoia" : {
+        "actions" : {
+                "sulk" : 0.007,
+                "stand" : -0.005,
+                "sit" : -0.002,
+                "cross_legs" : -0.001,
+                "cross_arms" : 0.005,
+                "lean_forward" : 0.002
+            },
+            "modifiers" : {
+                "casually" : 1.5,
+                "threateningly" : 0.4,
+                "openly" : 1.0,
+                "worriedly" : 0.9
+            },
+        "adjacent_affects" : ["envy"],
+        "equilibrium_point" : 0.5
+    },
+    "appreciation" : {
+        "actions" : {
+                "sulk" : 0.0007,
+                "stand" : -0.0005,
+                "sit" : -0.0002,
+                "cross_legs" : -0.0001,
+                "cross_arms" : 0.5,
+                "lean_forward" : 0.2
+            },
+            "modifiers" : {
+                "casually" : 1.25,
+                "threateningly" : 0.9,
+                "openly" : 1.0,
+                "worriedly" : 0.8
+            },
+        "adjacent_affects" : ["adoration"],
+        "equilibrium_point" : 0.5
+    },
+    "envy" : {
+        "actions" : {
+                "sulk" : 0.00007,
+                "stand" : -0.00005,
+                "sit" : -0.00002,
+                "cross_legs" : -0.00001,
+                "cross_arms" : 0.00005,
+                "lean_forward" : 0.00002
+            },
+            "modifiers" : {
+                "casually" : 1.2,
+                "threateningly" : 0.6,
+                "openly" : 1.0,
+                "worriedly" : 0.5
+            },
+        "adjacent_affects" : ["hatred"],
+        "equilibrium_point" : 0.5
+    },
+    "caring" : {
+        "actions" : {
+                "sulk" : 0.000007,
+                "stand" : -0.000005,
+                "sit" : -0.000002,
+                "cross_legs" : -0.000001,
+                "cross_arms" : 0.000005,
+                "lean_forward" : 0.000002
+            },
+            "modifiers" : {
+                "casually" : 1.25,
+                "threateningly" : 0.9,
+                "openly" : 1.0,
+                "worriedly" : 0.8
+            },
+        "adjacent_affects" : ["happiness", "contentment"],
+        "equilibrium_point" : 0.5
+    },
+    "happiness" : {
+        "actions" : {
+                "sulk" : 0.0000007,
+                "stand" : -0.0000005,
+                "sit" : -0.0000002,
+                "cross_legs" : -0.0000001,
+                "cross_arms" : 0.0000005,
+                "lean_forward" : 0.0000002
+            },
+            "modifiers" : {
+                "casually" : 1.25,
+                "threateningly" : 0.9,
+                "openly" : 1.0,
+                "worriedly" : 0.8
+            },
+        "adjacent_affects" : ["caring"],
+        "equilibrium_point" : 0.5
+    },
+    "contentment" : {
+        "actions" : {
+                "sulk" : 0.00000007,
+                "stand" : -0.00000005,
+                "sit" : -0.00000002,
+                "cross_legs" : -0.00000001,
+                "cross_arms" : 0.00000005,
+                "lean_forward" : 0.00000002
+            },
+            "modifiers" : {
+                "casually" : 1.25,
+                "threateningly" : 0.9,
+                "openly" : 1.0,
+                "worriedly" : 0.8
+            },
+        "adjacent_affects" : ["appreciation"],
+        "equilibrium_point" : 0.5
+    }
+}
