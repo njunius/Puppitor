@@ -116,21 +116,23 @@ class Action_Key_Map:
     # MODIFERS, ACTIONS, AND CADENCES ARE ASSUMED TO BE MUTUALLY EXCLUSIVE WHEN UPDATING
     def update_actual_states(self, state_to_update, class_of_action, new_value):
         
-        if state_to_update in self.actual_action_states[class_of_action]:
+        updatable_states = self.actual_action_states[class_of_action]
+        
+        if state_to_update in updatable_states:
             # go through each of the possible actions or modifiers or cadences
             # and set all but the one being explicitly changed to False
             # and use the given value (new_value) to update the value of the
             # specified action/modifier/cadence
-            for state in self.actual_action_states[class_of_action]:
+            for state in updatable_states:
                 if state_to_update == state:
-                    self.actual_action_states[class_of_action][state] = new_value
+                    updatable_states[state] = new_value
                     self.current_states[class_of_action] = state
                 else:
-                    self.actual_action_states[class_of_action][state] = False
+                    updatable_states[state] = False
             if new_value == False:
                 # return to doing the default behavior
                 self.current_states[class_of_action] = self._default_states[class_of_action]
-                self.actual_action_states[class_of_action][self._default_states[class_of_action]] = True
+                updatable_states[self._default_states[class_of_action]] = True
             return
         else:
             print('state: ' + state_to_update + ' is not a type of ' + class_of_action)
