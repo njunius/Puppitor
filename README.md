@@ -13,3 +13,6 @@
  `secondary`contains potentially useful modules in either driving or reacting to state changes in Puppitor's core modules:
  * `animation_structure.py` (contains the `Animation_Structure` class designed for reactive sprite animation based on the states tracked by an `Affecter` and `Action_Key_Map`)
  * `npc_greedy.py` (contains the `think` function that performs a greedy search over a given affect_vector, the `current_emotional_state` argument, using a given `action_key_map` and `affecter` as the basis for actions to try and effects to evaluate)
+
+# Usage
+To use Puppitor simply put the desired `.py` files in the desired directory and import them into your project. 
