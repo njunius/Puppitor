@@ -15,4 +15,4 @@
  * `npc_greedy.py` (contains the `think` function that performs a greedy search over a given affect_vector, the `current_emotional_state` argument, using a given `action_key_map` and `affecter` as the basis for actions to try and effects to evaluate)
 
 # Usage
-To use Puppitor simply put the desired `.py` files in the desired directory and import them into your project. 
+To use Puppitor simply put the desired `.py` files in the desired directory and import them into your project. Note that to use the components of `affecter.py` you will need to have JSON files formatted as Puppitor rules, examples can be found in `affect_rules`. Detailed API descriptions to come.
