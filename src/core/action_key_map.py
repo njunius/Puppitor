@@ -1,4 +1,4 @@
-# gesture_interface contains the default keybindings for performing gestures in a dictionary
+# action_key_map contains the interface for storing keybindings and performing actions
 # the dictionary is modeled on Ren'Py's keymap
 # the class also wraps the flags for detecting if an action is being done
 #
@@ -15,17 +15,12 @@ class Action_Key_Map:
     
     def __init__(self, key_map, default_action = 'resting', default_modifier = 'neutral'):
         
-        # ALL must have a value corresponding to a key in the actual_action_states dictionary of actions or modifiers
-        # for the current usage both the current and default actions are initialized to the first value in the actions list 
-        # for the current usage both the current and default modifiers are initialized to the last value in the modifiers list
-        
         # this dictionary and values should not be modified ever and are generally for internal use only
         self._default_states = {
                                 'actions' : default_action,
                                 'modifiers' : default_modifier
                               }
-        # this dictionary and values should only be modified internally and are used to access the current
-        # state of the actions being performed 
+        # this dictionary and values should only be modified internally and are used to access the current state of the actions being performed 
         self.current_states = {
                                 'actions' : self._default_states['actions'],
                                 'modifiers' : self._default_states['modifiers']
@@ -113,7 +108,7 @@ class Action_Key_Map:
     # UPDATING AN ACTION WILL SET ALL OTHER ACTIONS TO FALSE
     # UPDATING A MODIFIER WILL SET ALL OTHER MODIFIERS TO FALSE
     #
-    # MODIFERS, ACTIONS, AND CADENCES ARE ASSUMED TO BE MUTUALLY EXCLUSIVE WHEN UPDATING
+    # MODIFERS AND ACTIONS ARE ASSUMED TO BE MUTUALLY EXCLUSIVE WHEN UPDATING
     def update_actual_states(self, state_to_update, class_of_action, new_value):
         
         updatable_states = self.actual_action_states[class_of_action]

@@ -2,7 +2,7 @@
 # Affecter is a wrapper around a JSON object based dictionary of affects (see contents of the affect_rules directory for formatting details)
 # 
 # By default Affecter clamps the values of an affect vector (dictionaries built using make_affect_vector) in the range of 0.0 to 1.0 and uses theatrical terminology, consistent with 
-# the default keys in gesture_keys.py inside of the actual_action_states dictionary in the Gesture_Interface class
+# the default keys in action_key_map.py inside of the actual_action_states dictionary in the Action_Key_Map class
 #
 import json
 import random
@@ -21,7 +21,15 @@ class Affecter:
         self.floor_value = affect_floor
         self.ceil_value = affect_ceiling
         self.equilibrium_action = equilibrium_action
-        self.current_affect = None # changed to None because this value will get updated immediately through the run loop (as long as you call update_affect()
+        self.current_affect = None 
+        
+        for affect in self.affect_rules:
+            entry_equilibrium = self.affect_rules[affect]['equilibrium_point']
+            
+            if not self.current_affect:
+                self.current_affect = affect
+            elif entry_equilibrium > self.affect_rules[self.current_affect]['equilibrium_point']:
+                self.current_affect = affect
 
     # discards the stored affect_rules and replaces it with a new rule_file in the above JSON format
     def load_open_rule_file(self, affect_rule_file):
@@ -35,9 +43,9 @@ class Affecter:
     
     # affect_vector is a dictionary built using make_affect_vector()
     # the floats correspond to the strength of the expressed affect
-    # current_action corresponds to the standard action expressed by a Gesture_Interface instance in its actual_action_states
+    # current_action corresponds to the standard action expressed by an Action_Key_Map instance in its actual_action_states
     # NOTE: clamps affect values between floor_value and ceil_value
-    # NOTE: while performing the equilibrium_action the affect values will move toward the equilibrium_value of the given affect_vector
+    # NOTE: while performing the equilibrium_action the affect values will move toward the equilibrium_value of the Affecter
     def update_affect(self, affect_vector, current_action, current_modifier):
         for affect in affect_vector:
             
@@ -124,7 +132,7 @@ class Affecter:
         
         
 # affect_names takes a list of strings
-# equilibrium_values is expected to be the rules stored in the affect_rules dictionary of a Gesture_Affecter
+# equilibrium_values is expected to be the rules stored in the affect_rules dictionary of an Affecter
 def make_affect_vector(affect_names, equilibrium_values):
     
     affect_vector = {}
