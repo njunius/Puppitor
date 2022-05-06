@@ -80,15 +80,14 @@ class Affecter:
         
             if not prevailing_affects:
                 prevailing_affects.append(current_affect)
-                continue
-
-            highest_value_seen = affect_vector[prevailing_affects[0]]
-            
-            if highest_value_seen < current_affect_value:
-                prevailing_affects = []
-                prevailing_affects.append(current_affect)
-            elif abs(highest_value_seen - current_affect_value) < allowable_error:
-                prevailing_affects.append(current_affect)
+            else:
+                highest_value_seen = affect_vector[prevailing_affects[0]]
+                
+                if highest_value_seen < current_affect_value:
+                    prevailing_affects = []
+                    prevailing_affects.append(current_affect)
+                elif abs(highest_value_seen - current_affect_value) < allowable_error:
+                    prevailing_affects.append(current_affect)
             
         return prevailing_affects
 
