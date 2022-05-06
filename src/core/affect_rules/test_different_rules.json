@@ -14,7 +14,9 @@
                 "openly" : 1.0,
                 "worriedly" : 0.8
             },        
-        "adjacent_affects" : ["paranoia"],
+        "adjacent_affects" : {
+            "paranoia" : 100
+        },
         "equilibrium_point" : 0.5
     },
     "adoration" : {
@@ -32,7 +34,9 @@
                 "openly" : 1.0,
                 "worriedly" : 0.9
             },
-        "adjacent_affects" : ["appreciation"],
+        "adjacent_affects" : {
+            "appreciation" : 100
+        },
         "equilibrium_point" : 0.5
     },
     "paranoia" : {
@@ -50,7 +54,9 @@
                 "openly" : 1.0,
                 "worriedly" : 0.9
             },
-        "adjacent_affects" : ["envy"],
+        "adjacent_affects" : {
+            "envy" : 100
+        },
         "equilibrium_point" : 0.5
     },
     "appreciation" : {
@@ -68,7 +74,9 @@
                 "openly" : 1.0,
                 "worriedly" : 0.8
             },
-        "adjacent_affects" : ["adoration"],
+        "adjacent_affects" : {
+            "adoration" : 100
+        },
         "equilibrium_point" : 0.5
     },
     "envy" : {
@@ -86,7 +94,9 @@
                 "openly" : 1.0,
                 "worriedly" : 0.5
             },
-        "adjacent_affects" : ["hatred"],
+        "adjacent_affects" : {
+            "hatred" : 100
+        },
         "equilibrium_point" : 0.5
     },
     "caring" : {
@@ -104,7 +114,10 @@
                 "openly" : 1.0,
                 "worriedly" : 0.8
             },
-        "adjacent_affects" : ["happiness", "contentment"],
+        "adjacent_affects" : {
+            "happiness" : 55, 
+            "contentment" : 45
+        },
         "equilibrium_point" : 0.5
     },
     "happiness" : {
@@ -122,7 +135,9 @@
                 "openly" : 1.0,
                 "worriedly" : 0.8
             },
-        "adjacent_affects" : ["caring"],
+        "adjacent_affects" : {
+            "caring" : 100
+        },
         "equilibrium_point" : 0.5
     },
     "contentment" : {
@@ -140,7 +155,9 @@
                 "openly" : 1.0,
                 "worriedly" : 0.8
             },
-        "adjacent_affects" : ["appreciation"],
+        "adjacent_affects" : {
+            "appreciation" : 100
+        },
         "equilibrium_point" : 0.5
     }
 }

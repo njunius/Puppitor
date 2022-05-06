@@ -100,7 +100,7 @@ class Affecter:
     #   if the current_affect is not in the set but there is at least one affect connected to the current affect, pick from that subset
     #   otherwise randomly pick from the disconnected set of possible affects
     # TODO: if picking from connected affects return the one that has been at maximum value the longest and is still valid
-    def choose_prevailing_affect(self, possible_affects):
+    def choose_prevailing_affect(self, possible_affects, random_floor = 0, random_ceil = 100):
         
         connected_affects = []
 
@@ -109,11 +109,27 @@ class Affecter:
             return self.current_affect
         if self.current_affect in possible_affects:
             return self.current_affect
+            
+        curr_affect_adjacency_weights = self.affect_rules[self.current_affect]['adjacent_affects']
+        
         for affect in possible_affects:
-            if affect in self.affect_rules[self.current_affect]['adjacent_affects']:
+            if affect in curr_affect_adjacency_weights.keys():
                 connected_affects.append(affect)
                 
         if connected_affects:
+            random_choice = random.randint(random_floor, random_ceil)
+            
+            # weighted random choice of the connected affects to the current affect
+            # a weight of 0 is ignored
+            for affect in connected_affects:
+            
+                curr_affect_weight = curr_affect_adjacency_weights[affect]
+                if curr_affect_weight > 0 and random_choice <= curr_affect_weight:
+                    self.current_affect = affect
+                    return self.current_affect
+                random_choice = random_choice - curr_affect_weight
+        
+            # if all weights are zero, just pick randomly
             self.current_affect = random.choice(connected_affects)
             return self.current_affect
         else:
