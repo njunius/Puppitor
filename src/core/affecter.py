@@ -117,20 +117,7 @@ class Affecter:
                 connected_affects.append(affect)
                 
         if connected_affects:
-            random_choice = random.randint(random_floor, random_ceil)
-            
-            # weighted random choice of the connected affects to the current affect
-            # a weight of 0 is ignored
-            for affect in connected_affects:
-            
-                curr_affect_weight = curr_affect_adjacency_weights[affect]
-                if curr_affect_weight > 0 and random_choice <= curr_affect_weight:
-                    self.current_affect = affect
-                    return self.current_affect
-                random_choice = random_choice - curr_affect_weight
-        
-            # if all weights are zero, just pick randomly
-            self.current_affect = random.choice(connected_affects)
+            self.current_affect = choose_weighted_random_affect(connected_affects, curr_affect_adjacency_weights, self.current_affect, random_floor, random_ceil)
             return self.current_affect
         else:
             self.current_affect = random.choice(possible_affects)
@@ -145,6 +132,30 @@ class Affecter:
         prevailing_affect = self.choose_prevailing_affect(possible_affects)
         return prevailing_affect
         
+# returns a chosen affect from connected_affects based on curr_affect_adjacency_weights
+# if all values in curr_affect_adjacency_weights are 0, then no weighting is used and a random affect is chosen
+# connected_affects is a list of strings
+# curr_affect_adjacency_weights is a dictionary of <string, int> 
+# current_affect is a string and is the default affect if there are no adjacencies
+# random_floor and random_ceil are integers
+def choose_weighted_random_affect(connected_affects, curr_affect_adjacency_weights, current_affect, random_floor = 0, random_ceil = 100):
+
+    random_choice = random.randint(random_floor, random_ceil)
+            
+    # weighted random choice of the connected affects to the current affect
+    # a weight of 0 is ignored
+    for affect in connected_affects:
+    
+        curr_affect_weight = curr_affect_adjacency_weights[affect]
+        if curr_affect_weight > 0 and random_choice <= curr_affect_weight:
+            return affect
+        random_choice -= curr_affect_weight
+
+    # if all weights are zero, just pick randomly and if there are no adjacencies just keep doing what you are told
+    if(connected_affects):
+        return random.choice(connected_affects)
+    else:
+        return current_affect
         
 # affect_names takes a list of strings
 # equilibrium_values is expected to be the rules stored in the affect_rules dictionary of an Affecter
