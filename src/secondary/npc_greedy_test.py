@@ -2,7 +2,7 @@ import npc_greedy
 import action_key_map
 import affecter
 
-rule_file = open('affect_rules/rika_affect_rules.json', 'r')
+rule_file = open('affect_rules/test_passions_rules.json', 'r')
 rika_affecter = affecter.Affecter(rule_file)
 rika_affect_vector = affecter.make_affect_vector(rika_affecter.affect_rules.keys(), rika_affecter.affect_rules)
 
@@ -18,19 +18,20 @@ npc_key_map = {
                     'tempo_down': [None]
                 }
            }
-# and applied by the punctuation_printout_rules module
 npc_gesture_keys = action_key_map.Action_Key_Map(npc_key_map)
 
-action, modifier = npc_greedy.think(npc_gesture_keys, rika_affecter, rika_affect_vector, 'joy')
+npc_brain = npc_greedy.Greedy_Search(len(npc_gesture_keys.actual_action_states['actions'].keys()), len(npc_gesture_keys.actual_action_states['modifiers'].keys()), rika_affect_vector.keys())
+
+action, modifier = npc_brain.think(npc_gesture_keys, rika_affecter, rika_affect_vector, 'joy')
 
 rika_affecter.update_affect(rika_affect_vector, action, modifier)
 
 print()
 
-npc_greedy.think(npc_gesture_keys, rika_affecter, rika_affect_vector, 'joy')
+print(npc_brain.think(npc_gesture_keys, rika_affecter, rika_affect_vector, 'joy'))
 
 rika_affecter.update_affect(rika_affect_vector, action, modifier)
 
 print()
 
-npc_greedy.think(npc_gesture_keys, rika_affecter, rika_affect_vector, 'joy')
+print(npc_brain.think(npc_gesture_keys, rika_affecter, rika_affect_vector, 'sadness'))
