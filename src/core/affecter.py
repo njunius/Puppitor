@@ -30,6 +30,10 @@ class Affecter:
                 self.current_affect = affect
             elif entry_equilibrium > self.affect_rules[self.current_affect]['equilibrium_point']:
                 self.current_affect = affect
+                
+        # choosing affect lists
+        self.prevailing_affects = []
+        self.connected_affects = []
 
     # discards the stored affect_rules and replaces it with a new rule_file in the above JSON format
     def load_open_rule_file(self, affect_rule_file):
@@ -62,8 +66,7 @@ class Affecter:
                     affect_vector[affect] = self._update_and_clamp_values(current_affect_value, -1 * abs(value_to_add), current_equilibrium_value, self.ceil_value)
                 elif current_affect_value < current_equilibrium_value:
                     affect_vector[affect] = self._update_and_clamp_values(current_affect_value, abs(value_to_add), self.floor_value, current_equilibrium_value)
-                else:
-                    continue
+                
             else:
                 affect_vector[affect] = self._update_and_clamp_values(current_affect_value, value_to_add, self.floor_value, self.ceil_value)
         return
@@ -72,24 +75,24 @@ class Affecter:
     # returns a list of the affects with the highest strength of expression in the given affect_vector
     # allowable_error is used for dealing with the approximate value of floats
     def get_possible_affects(self, affect_vector, allowable_error = 0.00000001):
-        prevailing_affects = []
+        del self.prevailing_affects[:]
         
         for current_affect in affect_vector:
         
             current_affect_value = affect_vector[current_affect]
         
-            if not prevailing_affects:
-                prevailing_affects.append(current_affect)
+            if not self.prevailing_affects:
+                self.prevailing_affects.append(current_affect)
             else:
-                highest_value_seen = affect_vector[prevailing_affects[0]]
+                highest_value_seen = affect_vector[self.prevailing_affects[0]]
                 
                 if highest_value_seen < current_affect_value:
-                    prevailing_affects = []
-                    prevailing_affects.append(current_affect)
+                    del self.prevailing_affects[:]
+                    self.prevailing_affects.append(current_affect)
                 elif abs(highest_value_seen - current_affect_value) < allowable_error:
-                    prevailing_affects.append(current_affect)
+                    self.prevailing_affects.append(current_affect)
             
-        return prevailing_affects
+        return self.prevailing_affects
 
     # chooses the next current affect
     # possible_affects must be a list of strings of affects defined in the .json file loaded into the Affecter instance
@@ -101,8 +104,7 @@ class Affecter:
     #   otherwise randomly pick from the disconnected set of possible affects
     # TODO: if picking from connected affects return the one that has been at maximum value the longest and is still valid
     def choose_prevailing_affect(self, possible_affects, random_floor = 0, random_ceil = 100):
-        
-        connected_affects = []
+        del self.connected_affects[:]
 
         if len(possible_affects) == 1:
             self.current_affect = possible_affects[0]
@@ -114,10 +116,10 @@ class Affecter:
         
         for affect in possible_affects:
             if affect in curr_affect_adjacency_weights.keys():
-                connected_affects.append(affect)
+                self.connected_affects.append(affect)
                 
-        if connected_affects:
-            self.current_affect = choose_weighted_random_affect(connected_affects, curr_affect_adjacency_weights, self.current_affect, random_floor, random_ceil)
+        if self.connected_affects:
+            self.current_affect = choose_weighted_random_affect(self.connected_affects, curr_affect_adjacency_weights, self.current_affect, random_floor, random_ceil)
             return self.current_affect
         else:
             self.current_affect = random.choice(possible_affects)
