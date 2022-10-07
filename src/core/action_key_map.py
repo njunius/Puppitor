@@ -96,6 +96,16 @@ class Action_Key_Map:
         # allows toggling of keys rather than press and hold when true
         self.toggle = False
         
+        # list of all possible moves stored as (action, modifier) tuples for use with AI search algorithms to avoid rebuilding the set on the fly
+        # NOTE: USE get_moves() IF YOU NEED TO ALTER THE LIST AS PART OF THE SEARCH, get_moves() CREATES A COPY OF self.moves FOR THIS PURPOSE
+        self.moves = []
+        
+        for action in self.actual_action_states['actions']:
+            for modifier in self.actual_action_states['modifiers']:
+                self.moves.append((action, modifier))
+        
+        print(self.get_moves())
+        
     # USED FOR UPDATING BASED ON KEYBOARD INPUTS
     # updates a specified state to a new boolean value
     def update_possible_states(self, state_to_update, new_value):
@@ -132,4 +142,7 @@ class Action_Key_Map:
         else:
             print('state: ' + state_to_update + ' is not a type of ' + class_of_action)
         return
-        
+    
+    # makes a copy of self.moves to allow search algorithms like MCTS to easily store lists of available moves
+    def get_moves(self):        
+        return [(action, modifier) for action, modifier in self.moves]
