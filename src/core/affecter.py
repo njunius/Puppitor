@@ -170,3 +170,21 @@ def make_affect_vector(affect_names, equilibrium_values):
     
     return affect_vector
 
+# evaluates a given affect_vector based on the difference in values between the goal_emotion and the highest valued affects
+def evaluate_affect_vector(affect_vector, goal_emotion):
+    score = 0
+    goal_emotion_val = affect_vector[goal_emotion]
+    
+    # get all the keys for the max valued affects
+    max_affects = [key for key, value in affect_vector.items() if value == max(affect_vector.values())]
+    
+    if len(max_affects) == 1 and goal_emotion in max_affects:
+        score += 1
+    elif len(max_affects) > 1 and goal_emotion in max_affects:
+        score -= 1
+    else:
+        for affect in affect_vector:
+            if affect != goal_emotion:
+                score += goal_emotion_val - affect_vector[affect]
+    
+    return score
