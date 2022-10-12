@@ -77,21 +77,8 @@ class Affecter:
     def get_possible_affects(self, affect_vector, allowable_error = 0.00000001):
         del self.prevailing_affects[:]
         
-        for current_affect in affect_vector:
+        self.prevailing_affects = [key for key, value in affect_vector.items() if value == max(affect_vector.values())]
         
-            current_affect_value = affect_vector[current_affect]
-        
-            if not self.prevailing_affects:
-                self.prevailing_affects.append(current_affect)
-            else:
-                highest_value_seen = affect_vector[self.prevailing_affects[0]]
-                
-                if highest_value_seen < current_affect_value:
-                    del self.prevailing_affects[:]
-                    self.prevailing_affects.append(current_affect)
-                elif abs(highest_value_seen - current_affect_value) < allowable_error:
-                    self.prevailing_affects.append(current_affect)
-            
         return self.prevailing_affects
 
     # chooses the next current affect
