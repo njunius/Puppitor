@@ -1,4 +1,5 @@
 import npc_greedy
+import npc_uct
 import action_key_map
 import affecter
 
@@ -35,3 +36,7 @@ rika_affecter.update_affect(rika_affect_vector, action, modifier)
 print()
 
 print(npc_brain.think(npc_gesture_keys, rika_affecter, rika_affect_vector, 'sadness'))
+
+print()
+
+print(npc_uct.uct_think(rika_affect_vector, npc_gesture_keys, rika_affecter, 'love', 200))
