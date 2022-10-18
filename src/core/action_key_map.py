@@ -100,11 +100,12 @@ class Action_Key_Map:
         # NOTE: USE get_moves() IF YOU NEED TO ALTER THE LIST AS PART OF THE SEARCH, get_moves() CREATES A COPY OF self.moves FOR THIS PURPOSE
         self.moves = []
         
-        for action in self.actual_action_states['actions']:
-            for modifier in self.actual_action_states['modifiers']:
+        for action in self.actual_action_states['actions'].keys():
+            for modifier in self.actual_action_states['modifiers'].keys():
                 self.moves.append((action, modifier))
         
-        print(self.get_moves())
+        print('moves: ', self.moves)
+        print('get_moves(): ', self.get_moves())
         
     # USED FOR UPDATING BASED ON KEYBOARD INPUTS
     # updates a specified state to a new boolean value
