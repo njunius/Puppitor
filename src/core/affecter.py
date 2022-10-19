@@ -32,7 +32,6 @@ class Affecter:
                 self.current_affect = affect
                 
         # choosing affect lists
-        self.prevailing_affects = []
         self.connected_affects = []
 
     # discards the stored affect_rules and replaces it with a new rule_file in the above JSON format
@@ -73,13 +72,9 @@ class Affecter:
 
 # affect_vector should be a dictionary built using make_affect_vector()
 # returns a list of the affects with the highest strength of expression in the given affect_vector
-# allowable_error is used for dealing with the approximate value of floats
-def get_possible_affects(affecter, affect_vector, allowable_error = 0.00000001):
-    del affecter.prevailing_affects[:]
+def get_possible_affects(affect_vector):
+    return [key for key, value in affect_vector.items() if value == max(affect_vector.values())]
     
-    affecter.prevailing_affects = [key for key, value in affect_vector.items() if value == max(affect_vector.values())]
-    
-    return affecter.prevailing_affects
 
 # chooses the next current affect
 # possible_affects must be a list of strings of affects defined in the .json file loaded into the Affecter instance
@@ -116,8 +111,8 @@ def choose_prevailing_affect(affecter, possible_affects, random_floor = 0, rando
 # NOTE: this function is not intended to supercede the useage of both get_possible_affects() and choose_prevailing_affect()
 #       it is here for convenience and if the default behavior of immediately using the list created by get_possible_affects() in choose_prevailing_affect()
 #       is the desired functionality
-def get_prevailing_affect(affecter, affect_vector, allowable_error = 0.00000001):
-    possible_affects = get_possible_affects(affecter, affect_vector, allowable_error)
+def get_prevailing_affect(affecter, affect_vector):
+    possible_affects = get_possible_affects(affect_vector)
     prevailing_affect = choose_prevailing_affect(affecter, possible_affects)
     return prevailing_affect
         
@@ -147,16 +142,16 @@ def choose_weighted_random_affect(connected_affects, curr_affect_adjacency_weigh
         return current_affect
         
 # evaluates a given affect_vector based on the difference in values between the goal_emotion and the highest valued affects
-def evaluate_affect_vector(affecter, affect_vector, goal_emotion):
+def evaluate_affect_vector(current_affect, affect_vector, goal_emotion):
     score = 0
     goal_emotion_val = affect_vector[goal_emotion]
     
     # get all the keys for the max valued affects
-    max_affects = [key for key, value in affect_vector.items() if value == max(affect_vector.values())]
+    max_affects = get_possible_affects(affect_vector)
     
-    if affecter.current_affect == goal_emotion:
+    if current_affect == goal_emotion:
         score += 1
-    elif len(max_affects) > 1 and goal_emotion in max_affects and affecter.current_affect != goal_emotion:
+    elif len(max_affects) > 1 and goal_emotion in max_affects and current_affect != goal_emotion:
         score -= 1
     else:
         for affect in affect_vector:

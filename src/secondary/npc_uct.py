@@ -59,14 +59,14 @@ def uct_think(root_affect_vector, action_key_map, character_affecter, goal_emoti
         
         # rollout until we find an affect_vector where goal_emotion has a higher value relative to the other affects or have done N simulations and still not expressed the goal emotion
         rollout_length = 0
-        while affecter.evaluate_affect_vector(character_affecter, affect_vector, goal_emotion) < 0 and rollout_length < rollout_max:
+        while affecter.evaluate_affect_vector(character_affecter.current_affect, affect_vector, goal_emotion) < 0 and rollout_length < rollout_max:
             action, modifier = _update_affect_state(random.choice(action_key_map.get_moves()), affect_vector, character_affecter)
 
             rollout_length += 1
             
         # backpropogate
         while node != None: # backpropogate from the expanded node towards the root node
-            node.update(affecter.evaluate_affect_vector(character_affecter, affect_vector, goal_emotion))
+            node.update(affecter.evaluate_affect_vector(character_affecter.current_affect, affect_vector, goal_emotion))
             node = node.parent_node
         
     return max(rootnode.child_nodes, key = lambda c: c.reward/c.visits).move
@@ -74,6 +74,7 @@ def uct_think(root_affect_vector, action_key_map, character_affecter, goal_emoti
 def _update_affect_state(move, affect_vector, character_affecter):
     action, modifier = move
     character_affecter.update_affect(affect_vector, action, modifier)
+    affecter.get_prevailing_affect(character_affecter, affect_vector)
     
     return(action, modifier)
     
