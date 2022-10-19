@@ -36,7 +36,7 @@ class Greedy_Search:
             
             self.goal_emotion_value = self.copied_states[self.simulation_index][goal_emotion]
             #print(goal_emotion, goal_emotion_value)
-            self.future_states_for_evaluation[self.simulation_index] = (affecter.evaluate_affect_vector(self.copied_states[self.simulation_index], goal_emotion), action, modifier)
+            self.future_states_for_evaluation[self.simulation_index] = (affecter.evaluate_affect_vector(character_affecter, self.copied_states[self.simulation_index], goal_emotion), action, modifier)
             
             self.simulation_index += 1
                 

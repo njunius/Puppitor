@@ -108,8 +108,8 @@ print()
 print(test_affect_vector)
 print()
 
-print(test_affecter.get_possible_affects(test_affect_vector))
-print(test_affecter.get_prevailing_affect(test_affect_vector))
+print(affecter.get_possible_affects(test_affecter, test_affect_vector))
+print(affecter.get_prevailing_affect(test_affecter, test_affect_vector))
 
 print('\ndifferent output:\n')
 
@@ -149,5 +149,5 @@ print()
 print(different_affect_vector)
 print()
 
-print(different_affecter.get_possible_affects(different_affect_vector))
-print(different_affecter.get_prevailing_affect(different_affect_vector))
+print(affecter.get_possible_affects(different_affecter, different_affect_vector))
+print(affecter.get_prevailing_affect(different_affecter, different_affect_vector))
