@@ -22,7 +22,7 @@ class Node:
         return selected_child_node
         
     # remove move from untried_moves and add a new child node for the move and return it
-    def add_child(self, tried_move, action_key_map, prevailing_affect):
+    def add_child(self, tried_move, action_key_map):
         node = Node(move = tried_move, parent = self, action_key_map = action_key_map)
         self.untried_moves.remove(tried_move)
         self.child_nodes.append(node)
@@ -55,7 +55,7 @@ def uct_think(root_affect_vector, action_key_map, character_affecter, goal_emoti
             move = random.choice(node.untried_moves)
             action, modifier = _update_affect_state(move, affect_vector, character_affecter)
 
-            node = node.add_child(move, action_key_map, affecter.get_prevailing_affect(character_affecter, affect_vector))
+            node = node.add_child(move, action_key_map)
         
         # rollout until we find an affect_vector where goal_emotion has a higher value relative to the other affects or have done N simulations and still not expressed the goal emotion
         rollout_length = 0
