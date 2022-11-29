@@ -49,7 +49,10 @@ class Affecter:
     # current_action corresponds to the standard action expressed by an Action_Key_Map instance in its actual_action_states
     # NOTE: clamps affect values between floor_value and ceil_value
     # NOTE: while performing the equilibrium_action the affect values will move toward the equilibrium_value of the Affecter
-    def update_affect(self, affect_vector, current_action, current_modifier):
+    # value_multiplier allows the base value and value_add to be multiplied by a specified value
+    # value_add allows the base value to be added to be offset by a specified amount
+    # the defaults of value_multiplier and value_add do not scale the base values at all
+    def update_affect(self, affect_vector, current_action, current_modifier, value_multiplier = 1, value_add = 0):
         for affect in affect_vector:
             
             current_action_update_value = self.affect_rules[affect]['actions'][current_action]
@@ -57,7 +60,7 @@ class Affecter:
             current_equilibrium_value = self.affect_rules[affect]['equilibrium_point']
             current_affect_value = affect_vector[affect] # is a float or int so cannot be used to update values in the actual affect vector
             
-            value_to_add = current_modifier_update_value * current_action_update_value
+            value_to_add = value_multiplier * (current_modifier_update_value * current_action_update_value) + value_add
             
             # move values towards resting value by the equilibrium_point associated with affect
             if current_action == self.equilibrium_action:
