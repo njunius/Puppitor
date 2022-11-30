@@ -4,22 +4,23 @@ from heapq import heappush, heappop
 import copy
 
 # gets the nodes adjacent to the current affect_vector 
+# converts the affect_tuple back into a dictionary so it can be used with Puppitor functions
 def _puppitor_adjacencies(character_affecter, action_key_map, affect_tuple, goal_emotion, step_multiplier):
     moves = []
     affect_dict = dict(affect_tuple)
     
     affects = affect_dict.keys()
     
+    # make a list of every action and modifier combination and those nodes to the adjacency list
     for action, modifier in action_key_map.moves:
-        for affect in affects:
-            next_state = affect_dict.copy()
-            character_affecter.update_affect(next_state, action, modifier, step_multiplier) # make a new affect_vector for the new node and move to the adjacency
-            
-            node = (tuple(next_state.items()), action, modifier, affecter.get_prevailing_affect(character_affecter, next_state))
-            cost = _puppitor_edge_cost(character_affecter, affect_dict, action, modifier, affects, goal_emotion, step_multiplier) # calculate the edge cost of the new node
-            
-            moves.append((cost, node))
-    
+        next_state = affect_dict.copy()
+        character_affecter.update_affect(next_state, action, modifier, step_multiplier) # make a new affect_vector for the new node and move to the adjacency
+        
+        node = (tuple(next_state.items()), action, modifier, affecter.get_prevailing_affect(character_affecter, next_state))
+        cost = _puppitor_edge_cost(character_affecter, affect_dict, action, modifier, affects, goal_emotion, step_multiplier) # calculate the edge cost of the new node
+        
+        moves.append((cost, node))
+
     return moves
 
 # calculates the sum of the update values based on the given action and modifier
@@ -75,12 +76,14 @@ def _heuristic(character_affecter, current_affect, affect_vector, goal_emotion):
 
 # A* search for use with Puppitor
 # nodes are (affect_vector, action, modifier, prevailing_affect)
-# the traditional graph used for A* is split between the affecter and action_key_map modules
+# start is a tuple of (affect_vector, action, modifier, prevailing_affect)
+# NOTE: the traditional graph definition used for A* is split between the affecter and action_key_map modules
+# NOTE: affect_vectors must be converted to tuples as part of making a node because nodes must be hashable
 def npc_a_star_think(character_affecter, action_key_map, start, goal_emotion, step_multiplier = 1):
-    frontier = []
-    visited_nodes = []
-    cost_so_far = {}
-    prev_node = {}
+    frontier = [] # queue of nodes to visit
+    visited_nodes = [] # list of nodes that have been visited
+    cost_so_far = {} # the smallest cost to reach a given node
+    prev_node = {} # the node we traveled to the current node from
     
     start_node = (tuple(start[0].items()), start[1], start[2], start[3])
     heappush(frontier, (0, start_node))
@@ -91,15 +94,17 @@ def npc_a_star_think(character_affecter, action_key_map, start, goal_emotion, st
         curr_cost, curr_node = heappop(frontier)
 
         print(len(frontier))
+        # if the node's prevailing affect is the affect we want to express, get the path there
         if curr_node[3] == goal_emotion:
             path = []
             while curr_node:
                 path.append(curr_node)
                 curr_node = prev_node[curr_node]
-            #path.reverse()
+
             print(len(path), path)
             return path
         
+        # check every adjacent node of the current node and if it is a new node or a more efficient way to get to next_node, add it to the frontier
         for next in _puppitor_adjacencies(character_affecter, action_key_map, curr_node[0], goal_emotion, step_multiplier):
             next_cost, next_node = next
             new_cost = cost_so_far[curr_node] + next_cost + _heuristic(character_affecter, next_node[3], dict(next_node[0]), goal_emotion)
