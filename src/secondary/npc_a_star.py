@@ -23,7 +23,7 @@ def _puppitor_adjacencies(character_affecter, action_key_map, affect_tuple, goal
 
     return moves
 
-# calculates the sum of the update values based on the given action and modifier
+# calculates the magnitude of the change in value of the goal_emotion in affect_vector
 def _puppitor_edge_cost(character_affecter, affect_vector, action, modifier, affects, goal_emotion, step_multiplier):
     
     #cost = step_value + _affecter_action_modifier_product(character_affecter, action, modifier, goal_emotion, step_value)
@@ -37,10 +37,12 @@ def _puppitor_edge_cost(character_affecter, affect_vector, action, modifier, aff
     #    cost = abs(cost)
     return cost
 
+# multiplies the action, modifier, and step_multiplier values together
 def _affecter_action_modifier_product(character_affecter, action, modifier, affect, step_multiplier):
     return character_affecter.affect_rules[affect]['actions'][action] * character_affecter.affect_rules[affect]['modifiers'][modifier] * step_multiplier
 
-def _heuristic(character_affecter, current_affect, affect_vector, goal_emotion):
+# calculate the distance between the maximum value in affect_vector and the value of the goal_emotion
+def _heuristic(current_affect, affect_vector, goal_emotion):
     heuristic_value = 0
 
     max_value_nodes = affecter.get_possible_affects(affect_vector)
@@ -107,7 +109,7 @@ def npc_a_star_think(character_affecter, action_key_map, start, goal_emotion, st
         # check every adjacent node of the current node and if it is a new node or a more efficient way to get to next_node, add it to the frontier
         for next in _puppitor_adjacencies(character_affecter, action_key_map, curr_node[0], goal_emotion, step_multiplier):
             next_cost, next_node = next
-            new_cost = cost_so_far[curr_node] + next_cost + _heuristic(character_affecter, next_node[3], dict(next_node[0]), goal_emotion)
+            new_cost = cost_so_far[curr_node] + next_cost + _heuristic(next_node[3], dict(next_node[0]), goal_emotion)
             
             if next_node not in cost_so_far or new_cost < cost_so_far[next_node]:
                 cost_so_far[next_node] = new_cost
