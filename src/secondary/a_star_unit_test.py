@@ -9,7 +9,7 @@ def update_from_path(path):
     
     return (action, modifier)
     
-def maximize_minimize_affect_vector(affect_vector):
+def maximize_minimize_affect_vector(affect_vector, char_affecter):
     count = 0
     for affect in character_av:
         if count % 2 == 0:
@@ -18,6 +18,8 @@ def maximize_minimize_affect_vector(affect_vector):
             character_av[affect] = 1.0
         
         count += 1
+        
+    affecter.get_prevailing_affect(char_affecter, affect_vector)
     return
 
 def apply_print_path(path, character_av, step_value, verbose):
@@ -64,6 +66,7 @@ test_actions = action_key_map.Action_Key_Map(keymap)
 
 print()
 
+# expected to return a path using Rika's ruleset
 emotional_goal = 'anger'
 step_value = 90
 action = 'resting'
@@ -79,8 +82,9 @@ apply_print_path(action_path, character_av, step_value, verbose)
 
 print('\nfinal affect vector: ', character_av)
     
-maximize_minimize_affect_vector(character_av)
-        
+maximize_minimize_affect_vector(character_av, character_test)
+
+# expected to return a path using Rika's ruleset        
 emotional_goal = 'sadness'
 action = 'resting'
 modifier = 'neutral'
@@ -95,8 +99,9 @@ apply_print_path(action_path, character_av, step_value, verbose)
 
 print('\nfinal affect vector: ', character_av)
 
-maximize_minimize_affect_vector(character_av)
+maximize_minimize_affect_vector(character_av, character_test)
 
+# expected to return a path using Rika's ruleset
 emotional_goal = 'sadness'
 action = 'resting'
 modifier = 'neutral'
@@ -112,9 +117,9 @@ apply_print_path(action_path, character_av, step_value, verbose)
 
 print('\nfinal affect vector: ', character_av)
 
-maximize_minimize_affect_vector(character_av)
+maximize_minimize_affect_vector(character_av, character_test)
 
-
+# using Rika's ruleset this is expected to return NO PATH FOUND
 emotional_goal = 'fear'
 action = 'resting'
 modifier = 'neutral'
