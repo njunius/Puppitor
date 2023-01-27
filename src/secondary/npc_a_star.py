@@ -92,7 +92,7 @@ def npc_a_star_think(character_affecter, action_key_map, start, goal_emotion, st
     prev_node[start_node] = None
     cost_so_far[start_node] = 0
     
-    while frontier or len(frontier) < max_queue_size:
+    while frontier and len(frontier) < max_queue_size:
         curr_cost, curr_node = heappop(frontier)
 
         # if the node's prevailing affect is the affect we want to express, get the path there

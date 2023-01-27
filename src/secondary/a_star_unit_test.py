@@ -20,13 +20,24 @@ def maximize_minimize_affect_vector(affect_vector):
         count += 1
     return
 
-def print_path(path, character_av, step_value):
+def apply_print_path(path, character_av, step_value, verbose):
     while path:
         action, modifier = update_from_path(path)
-        print('\naction and modifier: ' + action + ', ' + modifier)
-        character_test.update_affect(character_av, action, modifier, step_value)
-        print('\ncharacter affect vector: ', character_av)
+        character_test.update_affect(character_av, action, modifier)
+        
+        if verbose:
+            print('\naction and modifier: ' + action + ', ' + modifier)
+            print('\ncharacter affect vector: ', character_av)
     return
+
+def print_run_info(step_value, emotional_goal, affect_vector):
+    print()
+    print('\nstep value: ', step_value, '\nemotional goal: ', emotional_goal)
+    print('\nstarting affect_vector: ', affect_vector, '\n')
+    
+    return
+
+verbose = False
 
 test_rule_file = open('affect_rules/test_passions_rules.json', 'r')
 character_rule_file = open('affect_rules/rika_affect_rules.json', 'r')
@@ -58,32 +69,31 @@ step_value = 90
 action = 'resting'
 modifier = 'neutral'
 
+print_run_info(step_value, emotional_goal, character_av)
+
 action_path = []
 start_node = (character_av, action, modifier, character_test.current_affect)
 action_path = npc_a_star.npc_a_star_think(character_test, test_actions, start_node, emotional_goal, step_value)
 
-print()
-print('step value: ', step_value, '\nemotional goal: ', emotional_goal)
-print()
-print(character_av)
+apply_print_path(action_path, character_av, step_value, verbose)
 
-print_path(action_path, character_av, step_value)
+print('\nfinal affect vector: ', character_av)
     
 maximize_minimize_affect_vector(character_av)
         
 emotional_goal = 'sadness'
 action = 'resting'
 modifier = 'neutral'
+
+print_run_info(step_value, emotional_goal, character_av)
+
 action_path = []
 start_node = (character_av, action, modifier, character_test.current_affect)
 action_path = npc_a_star.npc_a_star_think(character_test, test_actions, start_node, emotional_goal, step_value)
 
-print()
-print('step value: ', step_value, '\nemotional goal: ', emotional_goal)
-print()
-print(character_av)
+apply_print_path(action_path, character_av, step_value, verbose)
 
-print_path(action_path, character_av, step_value)
+print('\nfinal affect vector: ', character_av)
 
 maximize_minimize_affect_vector(character_av)
 
@@ -91,16 +101,31 @@ emotional_goal = 'sadness'
 action = 'resting'
 modifier = 'neutral'
 step_value = 30
+
+print_run_info(step_value, emotional_goal, character_av)
+
 action_path = []
 start_node = (character_av, action, modifier, character_test.current_affect)
 action_path = npc_a_star.npc_a_star_think(character_test, test_actions, start_node, emotional_goal, step_value)
 
-print()
-print('step value: ', step_value, '\nemotional goal: ', emotional_goal)
-print()
-print(character_av)
+apply_print_path(action_path, character_av, step_value, verbose)
 
-print_path(action_path, character_av, step_value)
+print('\nfinal affect vector: ', character_av)
 
 maximize_minimize_affect_vector(character_av)
 
+
+emotional_goal = 'fear'
+action = 'resting'
+modifier = 'neutral'
+step_value = 30
+
+print_run_info(step_value, emotional_goal, character_av)
+
+action_path = []
+start_node = (character_av, action, modifier, character_test.current_affect)
+action_path = npc_a_star.npc_a_star_think(character_test, test_actions, start_node, emotional_goal, step_value)
+
+apply_print_path(action_path, character_av, step_value, verbose)
+
+print('\nfinal affect vector: ', character_av)
