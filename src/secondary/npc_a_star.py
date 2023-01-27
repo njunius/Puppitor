@@ -53,23 +53,23 @@ def _heuristic(current_affect, affect_vector, goal_emotion):
     #if goal_emotion in max_value_nodes and current_affect != goal_emotion:
     #    heuristic_value = 100
     #elif goal_emotion not in max_value_nodes:
-        """max_action = ''
-        max_modifier = ''
-        max_action_value = 0
-        max_modifier_value = 0
+        #max_action = ''
+        #max_modifier = ''
+        #max_action_value = 0
+        #max_modifier_value = 0
         
-        for action, value in character_affecter.affect_rules[goal_emotion]['actions'].items():
-            if value == max(character_affecter.affect_rules[goal_emotion]['actions'].values()):
-                max_action = action
-                max_action_value = value
+        #for action, value in character_affecter.affect_rules[goal_emotion]['actions'].items():
+        #    if value == max(character_affecter.affect_rules[goal_emotion]['actions'].values()):
+        #        max_action = action
+        #        max_action_value = value
                 
-        for modifier, value in character_affecter.affect_rules[goal_emotion]['modifiers'].items():
-            if value == max(character_affecter.affect_rules[goal_emotion]['modifiers'].values()):
-                max_modifier = modifier
-                max_modifier_value = value
+        #for modifier, value in character_affecter.affect_rules[goal_emotion]['modifiers'].items():
+        #    if value == max(character_affecter.affect_rules[goal_emotion]['modifiers'].values()):
+        #        max_modifier = modifier
+        #        max_modifier_value = value
         
-        dist_to_max = (affect_vector[max_value_nodes[0]] - affect_vector[goal_emotion]) / (_affecter_action_modifier_product(character_affecter, max_action, max_modifier, goal_emotion) - _affecter_action_modifier_product(character_affecter, max_action, max_modifier, max_value_nodes[0]))
-        heuristic_value = dist_to_max"""
+        #dist_to_max = (affect_vector[max_value_nodes[0]] - affect_vector[goal_emotion]) / (_affecter_action_modifier_product(character_affecter, max_action, max_modifier, goal_emotion) - _affecter_action_modifier_product(character_affecter, max_action, max_modifier, max_value_nodes[0]))
+        #heuristic_value = dist_to_max"""
     #    heuristic_value = 0
     #else:
     #    heuristic_value = -1
@@ -81,7 +81,7 @@ def _heuristic(current_affect, affect_vector, goal_emotion):
 # start is a tuple of (affect_vector, action, modifier, prevailing_affect)
 # NOTE: the traditional graph definition used for A* is split between the affecter and action_key_map modules
 # NOTE: affect_vectors must be converted to tuples as part of making a node because nodes must be hashable
-def npc_a_star_think(character_affecter, action_key_map, start, goal_emotion, step_multiplier = 1):
+def npc_a_star_think(character_affecter, action_key_map, start, goal_emotion, step_multiplier = 1, max_queue_size = 18000):
     frontier = [] # queue of nodes to visit
     visited_nodes = [] # list of nodes that have been visited
     cost_so_far = {} # the smallest cost to reach a given node
@@ -92,18 +92,21 @@ def npc_a_star_think(character_affecter, action_key_map, start, goal_emotion, st
     prev_node[start_node] = None
     cost_so_far[start_node] = 0
     
-    while frontier:
+    while frontier or len(frontier) < max_queue_size:
         curr_cost, curr_node = heappop(frontier)
 
-        print(len(frontier))
         # if the node's prevailing affect is the affect we want to express, get the path there
         if curr_node[3] == goal_emotion:
             path = []
             while curr_node:
-                path.append(curr_node)
+                # add the number of steps it actually takes to reach the estimated distance
+                counter = 0
+                while counter < step_multiplier:
+                    counter += 1
+                    path.append(curr_node)
                 curr_node = prev_node[curr_node]
 
-            print(len(path), path)
+            print('path length: ', len(path), '\nfrontier length: ', len(frontier))
             return path
         
         # check every adjacent node of the current node and if it is a new node or a more efficient way to get to next_node, add it to the frontier
@@ -115,6 +118,7 @@ def npc_a_star_think(character_affecter, action_key_map, start, goal_emotion, st
                 cost_so_far[next_node] = new_cost
                 heappush(frontier, (new_cost, next_node))
                 prev_node[next_node] = curr_node
-                
+              
+    print('NO PATH FOUND WITHIN QUEUE SIZE LIMITS')
     return []
     
