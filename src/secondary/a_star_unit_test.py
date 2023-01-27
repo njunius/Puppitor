@@ -42,12 +42,12 @@ def print_run_info(step_value, emotional_goal, affect_vector):
 verbose = False
 
 test_rule_file = open('affect_rules/test_passions_rules.json', 'r')
-character_rule_file = open('affect_rules/rika_affect_rules.json', 'r')
+#character_rule_file = open('affect_rules/rika_affect_rules.json', 'r')
 
-test_affecter = affecter.Affecter(test_rule_file)
-test_affect_vector = affecter.make_affect_vector(test_affecter.affect_rules.keys(), test_affecter.affect_rules)
+#test_affecter = affecter.Affecter(test_rule_file)
+#test_affect_vector = affecter.make_affect_vector(test_affecter.affect_rules.keys(), test_affecter.affect_rules)
 
-character_test = affecter.Affecter(character_rule_file)
+character_test = affecter.Affecter(test_rule_file)
 character_av = affecter.make_affect_vector(character_test.affect_rules.keys(), character_test.affect_rules)
 
 keymap = {
