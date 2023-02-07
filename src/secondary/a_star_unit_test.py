@@ -47,7 +47,7 @@ def print_run_info(step_value, emotional_goal, affect_vector):
 
 verbose = False
 
-test_rule_file = open('affect_rules/chiara_affect_rules.json', 'r')
+test_rule_file = open('affect_rules/test_passions_rules.json', 'r')
 #character_rule_file = open('affect_rules/rika_affect_rules.json', 'r')
 
 #test_affecter = affecter.Affecter(test_rule_file)
