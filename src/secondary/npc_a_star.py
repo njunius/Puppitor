@@ -2,6 +2,7 @@ import action_key_map
 import affecter
 from heapq import heappush, heappop
 import copy
+import sys
 
 # gets the nodes adjacent to the current affect_vector 
 # converts the affect_tuple back into a dictionary so it can be used with Puppitor functions
@@ -14,10 +15,18 @@ def _puppitor_adjacencies(character_affecter, action_key_map, affect_tuple, goal
     # make a list of every action and modifier combination and those nodes to the adjacency list
     for action, modifier in action_key_map.moves:
         next_state = affect_dict.copy()
+        
+        max_value_affects = affecter.get_possible_affects(next_state)
+        step_distance = step_multiplier
+        goal_max_dist = _calc_distance_between_affects(next_state, max_value_affects[0], goal_emotion)
+        
+        if goal_max_dist < step_multiplier:
+            step_distance = goal_max_dist
+        
         character_affecter.update_affect(next_state, action, modifier, step_multiplier) # make a new affect_vector for the new node and move to the adjacency
         
         node = (tuple(next_state.items()), action, modifier, affecter.get_prevailing_affect(character_affecter, next_state))
-        cost = _puppitor_edge_cost(character_affecter, affect_dict, action, modifier, affects, goal_emotion, step_multiplier) # calculate the edge cost of the new node
+        cost = _puppitor_edge_cost(character_affecter, affect_dict, action, modifier, affects, goal_emotion, step_distance) # calculate the edge cost of the new node
         
         moves.append((cost, node))
 
@@ -26,55 +35,35 @@ def _puppitor_adjacencies(character_affecter, action_key_map, affect_tuple, goal
 # calculates the magnitude of the change in value of the goal_emotion in affect_vector
 def _puppitor_edge_cost(character_affecter, affect_vector, action, modifier, affects, goal_emotion, step_multiplier):
     
-    #cost = step_value + _affecter_action_modifier_product(character_affecter, action, modifier, goal_emotion, step_value)
-    #cost = -step_value * _affecter_action_modifier_product(character_affecter, action, modifier, goal_emotion, step_value)
-    
     cost = abs(_affecter_action_modifier_product(character_affecter, action, modifier, goal_emotion, step_multiplier))
-    
-    #current_affect = character_affecter.current_affect
-    
-    #if affecter.evaluate_affect_vector(current_affect, affect_vector, goal_emotion) == -1:
-    #    cost = abs(cost)
+
     return cost
 
 # multiplies the action, modifier, and step_multiplier values together
 def _affecter_action_modifier_product(character_affecter, action, modifier, affect, step_multiplier):
     return character_affecter.affect_rules[affect]['actions'][action] * character_affecter.affect_rules[affect]['modifiers'][modifier] * step_multiplier
 
-# calculate the distance between the maximum value in affect_vector and the value of the goal_emotion
+# calculate the heuristic value of an affect_vector based on:
+#   the goal_emotion value
+#   the highest valued affect(s)
+#   what the current prevailing affect is
 def _heuristic(current_affect, affect_vector, goal_emotion):
     heuristic_value = 0
 
     max_value_nodes = affecter.get_possible_affects(affect_vector)
     
-    if max_value_nodes:
-        heuristic_value = affect_vector[max_value_nodes[0]] - affect_vector[goal_emotion]
+    if goal_emotion in max_value_nodes and current_affect != goal_emotion: # return the furthest distance possible if the our goal_emotion is maxed out but not the prevailing affect
+        heuristic_value = sys.maxsize
+        return heuristic_value
     
-    #if goal_emotion in max_value_nodes and current_affect != goal_emotion:
-    #    heuristic_value = 100
-    #elif goal_emotion not in max_value_nodes:
-        #max_action = ''
-        #max_modifier = ''
-        #max_action_value = 0
-        #max_modifier_value = 0
-        
-        #for action, value in character_affecter.affect_rules[goal_emotion]['actions'].items():
-        #    if value == max(character_affecter.affect_rules[goal_emotion]['actions'].values()):
-        #        max_action = action
-        #        max_action_value = value
-                
-        #for modifier, value in character_affecter.affect_rules[goal_emotion]['modifiers'].items():
-        #    if value == max(character_affecter.affect_rules[goal_emotion]['modifiers'].values()):
-        #        max_modifier = modifier
-        #        max_modifier_value = value
-        
-        #dist_to_max = (affect_vector[max_value_nodes[0]] - affect_vector[goal_emotion]) / (_affecter_action_modifier_product(character_affecter, max_action, max_modifier, goal_emotion) - _affecter_action_modifier_product(character_affecter, max_action, max_modifier, max_value_nodes[0]))
-        #heuristic_value = dist_to_max"""
-    #    heuristic_value = 0
-    #else:
-    #    heuristic_value = -1
+    if max_value_nodes:
+        heuristic_value = _calc_distance_between_affects(affect_vector, max_value_nodes[0], goal_emotion)
     
     return heuristic_value
+    
+# calculate the distance between two affect values in an affect_vector
+def _calc_distance_between_affects(affect_vector, first_affect, second_affect):
+    return affect_vector[first_affect] - affect_vector[second_affect]
 
 # A* search for use with Puppitor
 # nodes are (affect_vector, action, modifier, prevailing_affect)
