@@ -1,0 +1,3 @@
+If all core Puppitor modules (affecter.py and action_key_map.py), affect_rules folder, and npc_a_star.py are in the same directory as a_star_unit_test.py then the following line in your preferred terminal will run the unit test with a step size of 180 and verbosity off
+
+py a_star_unit_test.py ./affect_rules/test_passions_rules.json ./key_map.json resting neutral 180 F 
