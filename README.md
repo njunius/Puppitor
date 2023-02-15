@@ -6,14 +6,22 @@
  public use for some time.
  
 # Directory Structure
- `core` contains the modules needed for basic functionality in Puppitor:
- * `affecter.py` (contains state tracking and rules application code housed in the `Affecter` class as well as `make_affect_vector()` which is used to format a python dictionary for use with `Affecter` features)
- * `action_key_map.py` (contains input mapping and state tracking in the `Action_Key_Map` class for use either with keyboard, and mouse button, input or AI behavior algorithms, can be used to drive changes in state to be applied to `affect_vectors` using rules stored in an `Affecter`)
- 
- `secondary`contains potentially useful modules in either driving or reacting to state changes in Puppitor's core modules:
- * `animation_structure.py` (contains the `Animation_Structure` class designed for reactive sprite animation based on the states tracked by an `Affecter` and `Action_Key_Map`)
- * `npc_greedy.py` (contains the `think` function that performs a greedy search over a given affect_vector, the `current_emotional_state` argument, using a given `action_key_map` and `affecter` as the basis for actions to try and effects to evaluate)
- * `npc_uct.py` (contains the `uct_think` function that performs Monte Carlo Tree Search based on given Puppitor inputs as well as the Node class for building trees)
+`src`:
+* `core` contains the modules needed for basic functionality in Puppitor:
+    * `affecter.py` (contains state tracking and rules application code housed in the `Affecter` class as well as `make_affect_vector()` which is used to format a python dictionary for use with `Affecter` features)
+    * `action_key_map.py` (contains input mapping and state tracking in the `Action_Key_Map` class for use either with keyboard, and mouse button, input or AI behavior algorithms, can be used to drive changes in state to be applied to `affect_vectors` using rules stored in an `Affecter`)
+
+* `secondary`contains potentially useful modules in either driving or reacting to state changes in Puppitor's core modules:
+    * `animation_structure.py` (contains the `Animation_Structure` class designed for reactive sprite animation based on the states tracked by an `Affecter` and `Action_Key_Map`)
+    * `npc_greedy.py` (contains the `think` function that performs a greedy search over a given affect_vector, the `current_emotional_state` argument, using a given `action_key_map` and `affecter` as the basis for actions to try and effects to evaluate)
+    * `npc_uct.py` (contains the `uct_think` function that performs Monte Carlo Tree Search based on given Puppitor inputs as well as the Node class for building trees)
+    * `npc_a_star.py` (contains the `npc_a_star_think` function that performs A* search from a given `affect_vector` towards a `goal_emotion`)
+
+`tools`:
+* `a_star_unit_test.py` (tests a given rule file over each of its possible affects by starting an A* search from the least ideal state possible, the `goal_emotion` value at 0 and every other value in an affect vector at 1. Prints the results of each trial)
+    * usage: `$ py a_star_unit_test.py ./affect_rules/test_passions_rules.json ./key_map.json resting neutral 180 F`
+* `rule_file_validator.py` (tests a given rule file and affect vector to see if a particular affect is expressable using A* search)
+    * usage: `$ py rule_file_validator.py ./affect_rules/test_passions_rules.json ./key_map.json ./affect_vector.json fear resting neutral 180 T <optional queue size limit argument>`
 
 # Usage
 To use Puppitor simply put the desired `.py` files in the desired directory and import them into your project. Note that to use the components of `affecter.py` you will need to have JSON files formatted as Puppitor rules, examples can be found in `affect_rules`. Detailed API descriptions to come.
