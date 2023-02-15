@@ -11,10 +11,11 @@ import test_helper as th
 # arguments:
 #   rule file path (string)
 #   key map file path (string)
-#   step multiplier (number)
-#   verbose flag (boolean)
 #   default action (string)
 #   default modifier (string)
+#   step multiplier (number)
+#   verbose flag (boolean)
+#   optional queue size (number)
 def main():
     verbose = False
     default_action = ''

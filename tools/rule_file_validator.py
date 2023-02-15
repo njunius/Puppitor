@@ -11,10 +11,13 @@ import test_helper as th
 # arguments:
 #   rule file path (string)
 #   key map file path (string)
-#   step multiplier (number)
-#   verbose flag (boolean)
+#   affect vector file path (string)
+#   goal emotion (string)
 #   default action (string)
 #   default modifier (string)
+#   step multiplier (number)
+#   verbose flag (boolean)
+#   optional queue size limit
 def main():
     verbose = False
     default_action = ''
