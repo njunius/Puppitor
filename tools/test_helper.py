@@ -34,3 +34,19 @@ def print_run_info(step_value, emotional_goal, affect_vector):
     print('\nstarting affect_vector: ', affect_vector, '\n')
     
     return
+    
+# finds the number of nodes it takes for the prevailing affect in a path to change
+def find_first_affect_change(path):
+    start_node = path[len(path) - 1]
+    init_affect = start_node[3]
+    count = 0
+    curr_affect = None
+    
+    for node in reversed(path):
+        curr_affect = node[3]
+        if curr_affect != init_affect:
+            return (count, init_affect, curr_affect)
+            
+        count += 1
+    
+    return (count, init_affect, curr_affect)

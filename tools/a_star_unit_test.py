@@ -68,7 +68,13 @@ def main():
         start_node = (character_av, action, modifier, character_test.current_affect)
         action_path = npc_a_star.npc_a_star_think(character_test, test_actions, start_node, emotional_goal, step_value, queue_limit)
 
+        delta_node_info = th.find_first_affect_change(action_path)
+
         th.apply_print_path(action_path, character_test, character_av, step_value, verbose)
+        
+        print('\nnumber of steps to display a new affect: ', delta_node_info[0], '\ninitial affect: ', delta_node_info[1], '\nnew affect: ', delta_node_info[2])
+    
+        print('\nif in a 60hz update loop it will take ', delta_node_info[0] / 60, ' seconds for a player to see a new expression')
         
         print('\nfinal affect vector: ', character_av)
     
