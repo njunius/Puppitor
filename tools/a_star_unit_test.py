@@ -46,7 +46,7 @@ def main():
     test_rule_file = open(rule_file_path, 'r')
 
     character_test = affecter.Affecter(test_rule_file)
-    character_av = affecter.make_affect_vector(character_test.affect_rules.keys(), character_test.affect_rules)
+    character_av = affecter.make_affect_vector(character_test.affect_rules)
 
     key_file = open(key_map_file_path, 'r')
     keymap = json.load(key_file)

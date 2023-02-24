@@ -28,6 +28,7 @@ def apply_print_path(path, char_affecter, character_av, step_value, verbose):
             print('\ncharacter affect vector: ', character_av)
     return
 
+# 
 def print_run_info(step_value, emotional_goal, affect_vector):
     print()
     print('\nstep value: ', step_value, '\nemotional goal: ', emotional_goal)
@@ -36,6 +37,7 @@ def print_run_info(step_value, emotional_goal, affect_vector):
     return
     
 # finds the number of nodes it takes for the prevailing affect in a path to change
+# note the path npc_a_star produces is in reverse order
 def find_first_affect_change(path):
     start_node = path[len(path) - 1]
     init_affect = start_node[3]

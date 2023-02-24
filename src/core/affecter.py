@@ -163,14 +163,13 @@ def evaluate_affect_vector(current_affect, affect_vector, goal_emotion):
     
     return score
 
-# affect_names takes a list of strings
-# equilibrium_values is expected to be the rules stored in the affect_rules dictionary of an Affecter
-def make_affect_vector(affect_names, equilibrium_values):
-    
+# reference_affect_rules is the dictionary of rules the affect_vector is intended to work with
+def make_affect_vector(reference_affect_rules):
+    affect_names = reference_affect_rules.keys()
     affect_vector = {}
     
     for affect in affect_names:
-        affect_vector[affect] = equilibrium_values[affect]['equilibrium_point']
+        affect_vector[affect] = reference_affect_rules[affect]['equilibrium_point']
     
     return affect_vector
 
