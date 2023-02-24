@@ -26,4 +26,16 @@
 # Usage
 To use Puppitor simply put `affecter.py` and `action_key_map.py` files in the desired directory and have `import affecter` and `import action_key_map` lines your project. Note that to use the components of `affecter.py` you will need to have JSON files formatted as Puppitor rules, examples can be found in `affect_rules`. Detailed API descriptions to come.
 
-To run the validation files found in `tools` you will need to move them into a directory with `affecter.py`, `action_key_map.py`, and `npc_a_star.py` as well as a json rule file, json key map file and for `rule_file_validator.py` a json file with an affect vector in it
+To run the validation files found in `tools` you will need to move them into a directory with `affecter.py`, `action_key_map.py`, and `npc_a_star.py` as well as a json rule file, json key map file and for `rule_file_validator.py` a json file with an affect vector in it. Example files can be found in the `tools` directory.
+
+Example Command Line calls:
+```
+for a_star_unit_test.py:
+
+$ py a_star_unit_test.py ./affect_rules/test_passions_rules.json ./key_map.json resting neutral 180 F <optional queue size limit argument>
+
+
+for rule_file_validator.py:
+
+$ py rule_file_validator.py ./affect_rules/test_passions_rules.json ./key_map.json ./affect_vector.json fear resting neutral 180 T <optional queue size limit argument>
+```
