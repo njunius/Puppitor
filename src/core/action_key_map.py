@@ -1,5 +1,5 @@
 # action_key_map contains the interface for storing keybindings and performing actions
-# the dictionary is modeled on Ren'Py's keymap
+# the dictionary is modeled on Ren'Py's key_map
 # the class also wraps the flags for detecting if an action is being done
 #
 # the possible_action_states dict is used to keep track of all interpreted actions being done and is updated based on keys and buttons pressed
@@ -25,9 +25,9 @@ class Action_Key_Map:
                                 'actions' : self._default_states['actions'],
                                 'modifiers' : self._default_states['modifiers']
                               }
-        # example keymap
-        # NOTE THAT THE KEYMAP SHOULD BE USING LISTS FOR KEYS TO ALLOW FOR THE POSSIBILITY OF MULTIPLE KEYS PERFORMING THE SAME ACTION
-        """self.keymap = {
+        # example key_map
+        # NOTE THAT THE key_map SHOULD BE USING LISTS FOR KEYS TO ALLOW FOR THE POSSIBILITY OF MULTIPLE KEYS PERFORMING THE SAME ACTION
+        """self.key_map = {
                             'actions': { 
                                 'open_flow': [pygame.K_n], 
                                 'closed_flow': [pygame.K_m], 
@@ -39,9 +39,9 @@ class Action_Key_Map:
                             }
                          }"""
         
-        self.keymap = key_map
+        self.key_map = key_map
         
-        print('\nkeymap:\n', self.keymap)
+        print('\nkey_map:\n', self.key_map)
         
         # flags corresponding to actions being specified by the user input
         # FOR INPUT DETECTION USE ONLY
@@ -55,10 +55,10 @@ class Action_Key_Map:
                       }"""
         self.possible_action_states = {}
             
-        for action in self.keymap['actions']:
+        for action in self.key_map['actions']:
             self.possible_action_states[action] = False
             
-        for modifier in self.keymap['modifiers']:
+        for modifier in self.key_map['modifiers']:
             self.possible_action_states[modifier] = False
             
         print('\npossible action states:\n', self.possible_action_states)
@@ -74,7 +74,6 @@ class Action_Key_Map:
                         #'projected_energy' : False, # an action
                         #'tempo_up' : False, # a modifier state
                         #'tempo_down' : False # a modifier state
-                        # 'pause' : False # a cadence action
                       }"""
         self.actual_action_states = {
                                       'actions' : {},
@@ -83,12 +82,12 @@ class Action_Key_Map:
         for category in self.actual_action_states:
             if category == 'actions':
                 self.actual_action_states['actions'][default_action] = True
-                for action in self.keymap['actions']:
+                for action in self.key_map['actions']:
                     self.actual_action_states['actions'][action] = False
             
             if category == 'modifiers':
                 self.actual_action_states['modifiers'][default_modifier] = True
-                for modifier in self.keymap['modifiers']:
+                for modifier in self.key_map['modifiers']:
                     self.actual_action_states['modifiers'][modifier] = False
                         
         print('\nactual action states:\n', self.actual_action_states)
@@ -147,3 +146,33 @@ class Action_Key_Map:
     # makes a copy of self.moves to allow search algorithms like MCTS to easily store lists of available moves
     def get_moves(self):        
         return [(action, modifier) for action, modifier in self.moves]
+        
+    # switches the default action or modifier to the specified new default
+    # new_default is a string
+    # class_of_action is either 'action' or 'modifier'
+    def change_default(self, new_default, class_of_action):
+        if class_of_action not in self._default_states:
+            print(class_of_action + ' is not an \'action\' or \'modifier\'')
+            return
+            
+        if new_default not in self.key_map[class_of_action]:
+            print(new_default + ' is not in ' + class_of_action)
+            return
+            
+        old_default = self._default_states[class_of_action]
+        old_non_default_keys = self.key_map[class_of_action][new_default]
+            
+        print('original default: ' + old_default + ', new_default original keys: ')
+        print(old_non_default_keys)
+        
+        self._default_states[class_of_action] = new_default
+        del self.key_map[class_of_action][new_default]
+        del self.possible_action_states[new_default]
+        self.key_map[class_of_action][old_default] = old_non_default_keys
+        self.possible_action_states[old_default] = False
+        
+        print('key_map', self.key_map)
+        print('possible_action_states', self.possible_action_states)
+        
+        return
+        
