@@ -148,7 +148,7 @@ class Action_Key_Map:
         return [(action, modifier) for action, modifier in self.moves]
         
     # switches the default action or modifier to the specified new default
-    # new_default is a string
+    # new_default is a string and must be an action or modifier in the existing set of actions and modifiers contained in action_key_map
     # class_of_action is either 'action' or 'modifier'
     def change_default(self, new_default, class_of_action):
         if class_of_action not in self._default_states:
