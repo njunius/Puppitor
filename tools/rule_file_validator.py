@@ -1,5 +1,6 @@
 import sys
 import json
+import csv
 import action_key_map
 import affecter
 import npc_a_star
@@ -70,14 +71,29 @@ def main():
     start_node = (character_av, action, modifier, character_test.current_affect)
     action_path = npc_a_star.npc_a_star_think(character_test, test_actions, start_node, goal_emotion, step_value, queue_limit)
 
-    delta_node_info = th.find_first_affect_change(action_path)
-
-    th.apply_print_path(action_path, character_test, character_av, step_value, verbose)
+    if not action_path:
+        return 0
     
-    print('\nnumber of steps to display a new affect: ', delta_node_info[0], '\ninitial affect: ', delta_node_info[1], '\nnew affect: ', delta_node_info[2])
+    response_curve = []
+    response_curve = th.find_all_affect_changes(action_path)
+    with open('response_curve.csv', 'w', newline = '') as csvfile:
+        response_writer = csv.writer(csvfile, delimiter = ',', quotechar = '|', quoting = csv.QUOTE_MINIMAL)
     
-    print('\nif in a 60hz update loop it will take ', delta_node_info[0] / 60, ' seconds for a player to see a new expression')
+        response_writer.writerow(['count', 'init_affect', 'prev_affect', 'curr_affect'])
+        response_writer.writerow([0, response_curve[0].init_affect, response_curve[0].init_affect, response_curve[0].init_affect]) # add initial state to file
     
+        for i, node in enumerate(response_curve):
+            step_diff = node.count
+            if i > 0:
+                step_diff = node.count - response_curve[i - 1].count
+                
+            print('\nnumber of steps to display a new affect: ', step_diff, '\nprevious affect: ', node.prev_affect, '\nnew affect: ', node.curr_affect, '\nit will take ', step_diff / 60, ' seconds for the player to see a new expression in a 60hz update loop')
+            
+            response_writer.writerow([node.count, node.init_affect, node.prev_affect, node.curr_affect])
+        last_index = len(response_curve) - 1
+        response_writer.writerow([len(action_path), response_curve[last_index].init_affect, response_curve[last_index].curr_affect, response_curve[last_index].curr_affect]) # add the last step to the file
+            
+    th.apply_print_path(action_path, character_test, character_av, step_value, verbose)    
     print('\nfinal affect vector: ', character_av)
 
     return 0

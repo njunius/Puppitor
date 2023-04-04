@@ -1,3 +1,4 @@
+import collections
 import action_key_map
 import affecter
 
@@ -52,3 +53,31 @@ def find_first_affect_change(path):
         count += 1
     
     return (count, init_affect, curr_affect)
+    
+# returns a list of each place in the given path where the expressed affect changes
+# the info in each list element returned is:
+#   - number of steps from the last place the expressed affect changed
+#   - the initial expressed affect
+#   - the previous expressed affect
+#   - the currently expressed affect
+def find_all_affect_changes(path):
+    delta_info = collections.namedtuple('delta_info', ['count', 'init_affect', 'prev_affect', 'curr_affect'])
+    
+    start_node = path[len(path) - 1]
+    init_affect = start_node[3]
+    prev_affect = init_affect
+    count = 0
+    curr_affect = None
+    
+    affect_changes = []
+    
+    for node in reversed(path):
+        curr_affect = node[3]
+        if curr_affect != prev_affect:
+            temp_node = delta_info._make((count, init_affect, prev_affect, curr_affect))
+            affect_changes.append(temp_node)
+            prev_affect = curr_affect
+        
+        count += 1
+    
+    return affect_changes
