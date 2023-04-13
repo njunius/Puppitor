@@ -21,12 +21,10 @@ class Greedy_Search:
         self.goal_emotion_value = 0.0
         self.simulation_index = 0
 
-    def think(self, action_key_map, character_affecter, current_emotional_state, goal_emotion):
+    def think(self, action_key_map, character_affecter, current_emotional_state, goal_emotion, step_value = 1):
         self.goal_emotion_value = 0.0
         self.simulation_index = 0
         
-        #for action in action_key_map.actual_action_states['actions'].keys():
-        #    for modifier in action_key_map.actual_action_states['modifiers'].keys():
         for action_modifier_pair in action_key_map.moves:
             #print(action, modifier)
             action, modifier = action_modifier_pair
