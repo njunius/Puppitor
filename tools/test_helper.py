@@ -61,22 +61,35 @@ def find_first_affect_change(path):
 #   - the previous expressed affect
 #   - the currently expressed affect
 def find_all_affect_changes(path):
-    delta_info = collections.namedtuple('delta_info', ['count', 'init_affect', 'prev_affect', 'curr_affect'])
+    delta_info = collections.namedtuple('delta_info', ['count', 'init_affect', 'prev_affect', 'curr_affect', 'curr_action', 'curr_mod'])
     
     start_node = path[len(path) - 1]
     init_affect = start_node[3]
     prev_affect = init_affect
+    prev_action = start_node[1]
+    prev_mod = start_node[2]
     count = 0
     curr_affect = None
     
     affect_changes = []
     
     for node in reversed(path):
+        curr_action = node[1]
+        curr_mod = node[2]
         curr_affect = node[3]
         if curr_affect != prev_affect:
-            temp_node = delta_info._make((count, init_affect, prev_affect, curr_affect))
+            temp_node = delta_info._make((count, init_affect, prev_affect, curr_affect, curr_action, curr_mod))
             affect_changes.append(temp_node)
             prev_affect = curr_affect
+            prev_action = curr_action
+            prev_mod = curr_mod
+        
+        elif curr_action != prev_action or curr_mod != prev_mod:
+            temp_node = delta_info._make((count, init_affect, prev_affect, curr_affect, curr_action, curr_mod))
+            affect_changes.append(temp_node)
+            prev_affect = curr_affect
+            prev_action = curr_action
+            prev_mod = curr_mod
         
         count += 1
     

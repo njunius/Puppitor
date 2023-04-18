@@ -78,20 +78,34 @@ def main():
     response_curve = th.find_all_affect_changes(action_path)
     with open('response_curve.csv', 'w', newline = '') as csvfile:
         response_writer = csv.writer(csvfile, delimiter = ',', quotechar = '|', quoting = csv.QUOTE_MINIMAL)
+        
+        start_state, start_action, start_mod, start_affect = action_path[len(action_path) - 1]
+        
+        response_writer.writerow(['count', 'init_affect', 'prev_affect', 'curr_affect', 'curr_action', 'curr_modifier'])
+        response_writer.writerow([0, start_affect, start_affect, start_affect, start_action, start_mod]) # add initial state to file
     
-        response_writer.writerow(['count', 'init_affect', 'prev_affect', 'curr_affect'])
-        response_writer.writerow([0, response_curve[0].init_affect, response_curve[0].init_affect, response_curve[0].init_affect]) # add initial state to file
+        affect_step_cache = 0
     
         for i, node in enumerate(response_curve):
             step_diff = node.count
             if i > 0:
                 step_diff = node.count - response_curve[i - 1].count
                 
-            print('\nnumber of steps to display a new affect: ', step_diff, '\nprevious affect: ', node.prev_affect, '\nnew affect: ', node.curr_affect, '\nit will take ', step_diff / 60, ' seconds for the player to see a new expression in a 60hz update loop')
+            if node.prev_affect != node.curr_affect:
+                if affect_step_cache == 0:
+                    step_diff = node.count
+                else:
+                    step_diff = node.count - affect_step_cache
+                
+                print('\nnumber of steps to display a new affect: ', step_diff, '\nprevious affect: ', node.prev_affect, '\nnew affect: ', node.curr_affect, '\nit will take ', step_diff / 60, ' seconds for the player to see a new expression in a 60hz update loop', '\naction: ', node.curr_action, '\nmodifier: ', node.curr_mod)
+                affect_step_cache = node.count
+            else:
+                print('\nnumber of steps for a new action or modifier to be used: ', step_diff, '\naction: ', node.curr_action, '\nmodifier: ', node.curr_mod)
             
-            response_writer.writerow([node.count, node.init_affect, node.prev_affect, node.curr_affect])
+            response_writer.writerow([node.count, node.init_affect, node.prev_affect, node.curr_affect, node.curr_action, node.curr_mod])
         last_index = len(response_curve) - 1
-        response_writer.writerow([len(action_path), response_curve[last_index].init_affect, response_curve[last_index].curr_affect, response_curve[last_index].curr_affect]) # add the last step to the file
+        end = response_curve[last_index]
+        response_writer.writerow([len(action_path), end.init_affect, end.curr_affect, end.curr_affect, end.curr_action, end.curr_mod]) # add the last step to the file
             
     th.apply_print_path(action_path, character_test, character_av, step_value, verbose)    
     print('\nfinal affect vector: ', character_av)
