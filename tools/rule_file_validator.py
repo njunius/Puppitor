@@ -69,7 +69,7 @@ def main():
     
     action_path = []
     start_node = (character_av, action, modifier, affecter.get_prevailing_affect(character_test, character_av))
-    action_path = npc_a_star.npc_a_star_think(character_test, test_actions, start_node, goal_emotion, step_value, queue_limit)
+    action_path = npc_a_star.npc_a_star_think(character_test, test_actions, start_node, goal_emotion, step_value, queue_limit, analysis = True)
 
     if not action_path:
         print('NO PATH FOUND')
