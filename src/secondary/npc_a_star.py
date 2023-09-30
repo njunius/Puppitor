@@ -33,7 +33,7 @@ def _puppitor_adjacencies(character_affecter, action_key_map, affect_tuple, goal
     return moves
 
 # calculates the magnitude of the change in value of the goal_emotion in affect_vector
-def _puppitor_edge_cost(character_affecter, action_key_map, affect_vector, action, modifier, affects, goal_emotion, step_multiplier):
+def _puppitor_edge_cost(character_affecter, affect_vector, action, modifier, affects, goal_emotion, step_multiplier):
     
     goal_delta = abs(_affecter_action_modifier_product(character_affecter, action, modifier, goal_emotion, step_multiplier))
     
