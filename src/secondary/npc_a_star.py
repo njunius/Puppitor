@@ -104,7 +104,7 @@ def _construct_path(curr_node, prev_node, character_affecter, step_multiplier, f
             counter += 1
         final_path = reconst_path
     
-    print('path length: ', len(final_path), '\nfrontier length: ', len(frontier))
+    print('path length: ', len(final_path), 'frontier length: ', len(frontier))
     return final_path
 
 # A* search for use with Puppitor
