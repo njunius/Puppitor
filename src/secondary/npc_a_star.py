@@ -33,10 +33,17 @@ def _puppitor_adjacencies(character_affecter, action_key_map, affect_tuple, goal
     return moves
 
 # calculates the magnitude of the change in value of the goal_emotion in affect_vector
-def _puppitor_edge_cost(character_affecter, affect_vector, action, modifier, affects, goal_emotion, step_multiplier):
+def _puppitor_edge_cost(character_affecter, action_key_map, affect_vector, action, modifier, affects, goal_emotion, step_multiplier):
     
-    cost = abs(_affecter_action_modifier_product(character_affecter, action, modifier, goal_emotion, step_multiplier))
+    goal_delta = abs(_affecter_action_modifier_product(character_affecter, action, modifier, goal_emotion, step_multiplier))
+    
+    max_val_affects = affecter.get_possible_affects(affect_vector)
+    
+    curr_max_delta = abs(_affecter_action_modifier_product(character_affecter, action, modifier, max_val_affects[0], step_multiplier))
+    
+    #cost = abs(_affecter_action_modifier_product(character_affecter, action, modifier, goal_emotion, step_multiplier))
 
+    cost = abs(curr_max_delta - goal_delta)
     return cost
 
 # multiplies the action, modifier, and step_multiplier values together
@@ -92,11 +99,28 @@ def npc_a_star_think(character_affecter, action_key_map, start, goal_emotion, st
                 counter = 0
                 while counter < step_multiplier:
                     counter += 1
-                    path.append(curr_node)
+                    updated_node = curr_node
+                    path.append(updated_node)
+                    if prev_node[curr_node] == None:
+                        break
                 curr_node = prev_node[curr_node]
 
+            reconst_path = []
+            counter = 0
+            for curr_node in reversed(path):
+                temp_av = dict(curr_node[0])
+                
+                if counter > 0:
+                    temp_av = dict(reconst_path[-1][0])
+                    character_affecter.update_affect(temp_av, curr_node[1], curr_node[2])
+                    
+                updated_node = (temp_av, curr_node[1], curr_node[2], affecter.get_prevailing_affect(character_affecter, temp_av))
+                reconst_path.append(updated_node)
+                counter += 1
+            
             print('path length: ', len(path), '\nfrontier length: ', len(frontier))
-            return path
+            reconst_path.reverse()
+            return reconst_path
         
         # check every adjacent node of the current node and if it is a new node or a more efficient way to get to next_node, add it to the frontier
         for next in _puppitor_adjacencies(character_affecter, action_key_map, curr_node[0], goal_emotion, step_multiplier):

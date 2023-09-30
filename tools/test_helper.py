@@ -2,6 +2,8 @@ import collections
 import action_key_map
 import affecter
 
+delta_info = collections.namedtuple('delta_info', ['count', 'init_affect', 'prev_affect', 'curr_affect', 'curr_action', 'curr_mod'])
+
 def update_from_path(path):
     node = path.pop()
     action = node[1]
@@ -26,6 +28,7 @@ def apply_print_path(path, char_affecter, character_av, step_value, verbose):
         
         if verbose:
             print('\naction and modifier: ' + action + ', ' + modifier)
+            print('\nprevailing affect: ' + affecter.get_prevailing_affect(char_affecter, character_av))
             print('\ncharacter affect vector: ', character_av)
     return
 
@@ -60,9 +63,7 @@ def find_first_affect_change(path):
 #   - the initial expressed affect
 #   - the previous expressed affect
 #   - the currently expressed affect
-def find_all_affect_changes(path):
-    delta_info = collections.namedtuple('delta_info', ['count', 'init_affect', 'prev_affect', 'curr_affect', 'curr_action', 'curr_mod'])
-    
+def find_all_affect_changes(path):    
     start_node = path[len(path) - 1]
     init_affect = start_node[3]
     prev_affect = init_affect

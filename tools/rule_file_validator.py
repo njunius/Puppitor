@@ -68,21 +68,28 @@ def main():
     th.print_run_info(step_value, goal_emotion, character_av)
     
     action_path = []
-    start_node = (character_av, action, modifier, character_test.current_affect)
+    start_node = (character_av, action, modifier, affecter.get_prevailing_affect(character_test, character_av))
     action_path = npc_a_star.npc_a_star_think(character_test, test_actions, start_node, goal_emotion, step_value, queue_limit)
 
     if not action_path:
+        print('NO PATH FOUND')
         return 0
     
     response_curve = []
-    response_curve = th.find_all_affect_changes(action_path)
+    if len(action_path) > 1:
+        response_curve = th.find_all_affect_changes(action_path)
+    else:
+        response_curve.append(th.delta_info._make((0, action_path[0][3], action_path[0][3], action_path[0][3], action_path[0][1], action_path[0][2])))
     with open('response_curve.csv', 'w', newline = '') as csvfile:
         response_writer = csv.writer(csvfile, delimiter = ',', quotechar = '|', quoting = csv.QUOTE_MINIMAL)
+        
+        print(action_path[-1])
         
         start_state, start_action, start_mod, start_affect = action_path[len(action_path) - 1]
         
         response_writer.writerow(['count', 'init_affect', 'prev_affect', 'curr_affect', 'curr_action', 'curr_modifier'])
-        response_writer.writerow([0, start_affect, start_affect, start_affect, start_action, start_mod]) # add initial state to file
+        if len(response_curve) > 1:
+            response_writer.writerow([0, start_affect, start_affect, start_affect, start_action, start_mod]) # add initial state to file
     
         affect_step_cache = 0
     
@@ -103,8 +110,8 @@ def main():
                 print('\nnumber of steps for a new action or modifier to be used: ', step_diff, '\naction: ', node.curr_action, '\nmodifier: ', node.curr_mod)
             
             response_writer.writerow([node.count, node.init_affect, node.prev_affect, node.curr_affect, node.curr_action, node.curr_mod])
-        last_index = len(response_curve) - 1
-        end = response_curve[last_index]
+        
+        end = response_curve[-1]
         response_writer.writerow([len(action_path), end.init_affect, end.curr_affect, end.curr_affect, end.curr_action, end.curr_mod]) # add the last step to the file
             
     th.apply_print_path(action_path, character_test, character_av, step_value, verbose)    
