@@ -1,9 +1,0 @@
-count,init_affect,prev_affect,curr_affect,curr_action,curr_modifier
-0,joy,joy,joy,resting,neutral
-180,joy,joy,joy,closed_flow,tempo_up
-360,joy,joy,sadness,closed_flow,tempo_up
-540,joy,sadness,sadness,open_flow,tempo_down
-720,joy,sadness,sadness,closed_flow,tempo_up
-900,joy,sadness,sadness,open_flow,tempo_down
-1080,joy,sadness,fear,resting,tempo_down
-1260,joy,fear,fear,resting,tempo_down

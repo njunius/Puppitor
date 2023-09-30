@@ -35,8 +35,15 @@ def _puppitor_adjacencies(character_affecter, action_key_map, affect_tuple, goal
 # calculates the magnitude of the change in value of the goal_emotion in affect_vector
 def _puppitor_edge_cost(character_affecter, affect_vector, action, modifier, affects, goal_emotion, step_multiplier):
     
-    cost = abs(_affecter_action_modifier_product(character_affecter, action, modifier, goal_emotion, step_multiplier))
+    goal_delta = abs(_affecter_action_modifier_product(character_affecter, action, modifier, goal_emotion, step_multiplier))
+    
+    max_val_affects = affecter.get_possible_affects(affect_vector)
+    
+    curr_max_delta = abs(_affecter_action_modifier_product(character_affecter, action, modifier, max_val_affects[0], step_multiplier))
+    
+    #cost = abs(_affecter_action_modifier_product(character_affecter, action, modifier, goal_emotion, step_multiplier))
 
+    cost = abs(curr_max_delta - goal_delta)
     return cost
 
 # multiplies the action, modifier, and step_multiplier values together
@@ -65,12 +72,47 @@ def _heuristic(current_affect, affect_vector, goal_emotion):
 def _calc_distance_between_affects(affect_vector, first_affect, second_affect):
     return affect_vector[first_affect] - affect_vector[second_affect]
 
+# constructs the path to be returned by A* search
+# each argument corresponds to the variable of the same name in npc_a_star_think()
+# analysis is a flag which enables full path reconstruction for the purposes of analyzing the output as it is slower than partial reconstruction that is the default behavior
+def _construct_path(curr_node, prev_node, character_affecter, step_multiplier, frontier, analysis = False):
+    path = []
+    while curr_node:
+        # add the number of steps it takes to reach the estimated distances
+        counter = 0
+        while counter < step_multiplier:
+            counter += 1
+            path.append(curr_node)
+            if prev_node[curr_node] == None:
+                break
+        curr_node = prev_node[curr_node]
+        
+    final_path = path
+    
+    if analysis:
+        reconst_path = []
+        counter = 0
+        for curr_node in reversed(path):
+            temp_av = dict(curr_node[0])
+            
+            if counter > 0:
+                temp_av = dict(reconst_path[-1][0])
+                character_affecter.update_affect(temp_av, curr_node[1], curr_node[2])
+                
+            updated_node = (temp_av, curr_node[1], curr_node[2], affecter.get_prevailing_affect(character_affecter, temp_av))
+            reconst_path.append(updated_node)
+            counter += 1
+        final_path = reconst_path
+    
+    print('path length: ', len(final_path), 'frontier length: ', len(frontier))
+    return final_path
+
 # A* search for use with Puppitor
 # nodes are (affect_vector, action, modifier, prevailing_affect)
 # start is a tuple of (affect_vector, action, modifier, prevailing_affect)
 # NOTE: the traditional graph definition used for A* is split between the affecter and action_key_map modules
 # NOTE: affect_vectors must be converted to tuples as part of making a node because nodes must be hashable
-def npc_a_star_think(character_affecter, action_key_map, start, goal_emotion, step_multiplier = 1, max_queue_size = 18000):
+def npc_a_star_think(character_affecter, action_key_map, start, goal_emotion, step_multiplier = 1, max_queue_size = 18000, analysis = False):
     frontier = [] # queue of nodes to visit
     visited_nodes = [] # list of nodes that have been visited
     cost_so_far = {} # the smallest cost to reach a given node
@@ -86,17 +128,7 @@ def npc_a_star_think(character_affecter, action_key_map, start, goal_emotion, st
 
         # if the node's prevailing affect is the affect we want to express, get the path there
         if curr_node[3] == goal_emotion:
-            path = []
-            while curr_node:
-                # add the number of steps it actually takes to reach the estimated distance
-                counter = 0
-                while counter < step_multiplier:
-                    counter += 1
-                    path.append(curr_node)
-                curr_node = prev_node[curr_node]
-
-            print('path length: ', len(path), '\nfrontier length: ', len(frontier))
-            return path
+            return _construct_path(curr_node, prev_node, character_affecter, step_multiplier, frontier, analysis)
         
         # check every adjacent node of the current node and if it is a new node or a more efficient way to get to next_node, add it to the frontier
         for next in _puppitor_adjacencies(character_affecter, action_key_map, curr_node[0], goal_emotion, step_multiplier):
