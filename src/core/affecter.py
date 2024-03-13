@@ -153,9 +153,9 @@ def evaluate_affect_vector(current_affect, affect_vector, goal_emotion):
     max_affects = get_possible_affects(affect_vector)
     
     if current_affect == goal_emotion:
-        score += 1
+        score += 10
     elif len(max_affects) > 1 and goal_emotion in max_affects and current_affect != goal_emotion:
-        score -= 1
+        score -= 10
     else:
         for affect in affect_vector:
             if affect != goal_emotion:

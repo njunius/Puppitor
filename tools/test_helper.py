@@ -95,3 +95,49 @@ def find_all_affect_changes(path):
         count += 1
     
     return affect_changes
+    
+# returns a list of each move made by the greedy_search
+# start is the initial state for the greedy_search to start from
+# start is formatted just like an A* node:
+#   - node[0] = affect_vector
+#   - node[1] = action
+#   - node[2] = modifier
+#   - node[3] = prevailing affect
+# key_map is a Puppitor action_key_map corresponding to the one used to make the greedy search instance
+# char_affecter is the affecter of the character whose rules will be used as the search domain
+# step_value controls how frequently the Greedy Search is allowed to re-evaluate its location in expressive space
+def make_greedy_path(start, greedy_search, key_map, char_affecter, goal_emotion, step_value):
+    result_path = []
+    
+    start_node = (tuple(start[0].items()), start[1], start[2], start[3])
+    print(start_node)
+    curr_node = start_node
+    result_path.append(curr_node)
+    
+    action = ''
+    mod = ''
+    
+    # as long as we aren't already expressing our emotional goal
+    while curr_node[3] != goal_emotion:
+        
+        new_av = dict(curr_node[0])
+        
+        action, mod = greedy_search.think(key_map, char_affecter, new_av, goal_emotion) # pick an action and modifier to perform for the next step_value times
+        
+        start_path_seg = result_path[-1] # build this next segment of the path starting from the end of the current path
+        print(start_path_seg)
+        index_av = dict(start_path_seg[0]) # unwrap the tuple back into a mutable affect vector
+        
+        for i in range(0, step_value):
+            new_av = index_av.copy()
+            char_affecter.update_affect(new_av, action, mod)
+            
+            new_node = (tuple(new_av.items()), action, mod, affecter.get_prevailing_affect(char_affecter, new_av))
+            result_path.append(new_node)
+            #print(new_node[3], goal_emotion)
+            index_av = new_av
+            
+        curr_node  = result_path[-1]
+        
+    return result_path
+    

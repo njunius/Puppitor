@@ -4,6 +4,7 @@ import csv
 import action_key_map
 import affecter
 import npc_a_star
+import npc_greedy
 import test_helper as th
 
 # runs a test of a given rule file, key map, starting affect vector and goal emotion
@@ -24,6 +25,14 @@ def main():
     default_action = ''
     default_modifier = ''
     queue_limit = 18000
+    
+    # ai modes are as follows:
+    # ai_mode 0 invokes A* search
+    # ai_mode 1 invokes greedy search
+    # ai_mode 2 invokes monty carlo tree search
+    ai_mode = 0
+    
+    greedy_instance = None
 
     args = sys.argv[1:]
     if not args or len(args) < 8:
@@ -36,7 +45,7 @@ def main():
     goal_emotion = args[3]
     default_action = args[4]
     default_modifier = args[5]
-    step_value = float(args[6])
+    step_value = int(args[6])
     if args[7] == 'f' or args[7] == 'F':
         verbose = False
     elif args[7] == 't' or args[7] == 'T':
@@ -45,8 +54,13 @@ def main():
         print('args[3] EXPECTED VALUE EITHER \'F\' or \'T\' EXITING WITH RETURN VALUE 2')
         return 2
     
-    if len(args) == 9:
-        queue_limit = int(args[8])
+    if args[8] == 'A*' or args[8] == 'a*' or args[8] == 'a star' or args[8] == 'astar':
+        ai_mode = 0
+    elif args[8] == 'greedy' or args[8] == 'Greedy' or args[8] == 'Greedy Search' or args[8] == 'Greedy search' or args[8] == 'greedy search' or args[8] == 'greedy Search':
+        ai_mode = 1
+        
+    if len(args) == 10:
+        queue_limit = int(args[9])
 
     test_rule_file = open(rule_file_path, 'r')
 
@@ -60,6 +74,11 @@ def main():
     
     test_actions = action_key_map.Action_Key_Map(keymap, default_action, default_modifier)
 
+    if ai_mode == 1:
+        p_states = test_actions.prevailing_states
+        greedy_instance = npc_greedy.Greedy_Search(len(p_states['actions'].keys()), len(p_states['modifiers'].keys()), character_av.keys())
+        print('\ngreedy instance created!\n', greedy_instance)
+
     print()
 
     action = test_actions._default_states['actions']
@@ -69,7 +88,11 @@ def main():
     
     action_path = []
     start_node = (character_av, action, modifier, affecter.get_prevailing_affect(character_test, character_av))
-    action_path = npc_a_star.npc_a_star_think(character_test, test_actions, start_node, goal_emotion, step_value, queue_limit, analysis = True)
+    
+    if(ai_mode == 0):
+        action_path = npc_a_star.npc_a_star_think(character_test, test_actions, start_node, goal_emotion, step_value, queue_limit, analysis = True)
+    elif(ai_mode == 1):        
+        action_path = th.make_greedy_path(start_node, greedy_instance, test_actions, character_test, goal_emotion, step_value)
 
     if not action_path:
         print('NO PATH FOUND')
