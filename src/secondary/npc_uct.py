@@ -35,7 +35,7 @@ class Node:
         
 # conduct a UCT search for itermax iterations from the given rootstate
 # returns the best move from the rootstate
-def uct_think(root_affect_vector, action_key_map, character_affecter, goal_emotion, itermax, rollout_max = 50):
+def uct_think(root_affect_vector, action_key_map, character_affecter, goal_emotion, itermax, rollout_max = 50, step_value = 1):
 
     rootnode = Node(action_key_map = action_key_map)
     
@@ -48,19 +48,19 @@ def uct_think(root_affect_vector, action_key_map, character_affecter, goal_emoti
         # selection
         while not node.untried_moves and node.child_nodes: # node is fully expanded and non-terminal
             node = node.uct_select_child()
-            action, modifier = _update_affect_state(node.move, affect_vector, character_affecter)
+            action, modifier = _update_affect_state(node.move, affect_vector, character_affecter, step_value)
         
         # expansion
         if node.untried_moves:
             move = random.choice(node.untried_moves)
-            action, modifier = _update_affect_state(move, affect_vector, character_affecter)
+            action, modifier = _update_affect_state(move, affect_vector, character_affecter, step_value)
 
             node = node.add_child(move, action_key_map)
         
         # rollout until we find an affect_vector where goal_emotion has a higher value relative to the other affects or have done N simulations and still not expressed the goal emotion
         rollout_length = 0
         while affecter.evaluate_affect_vector(character_affecter.current_affect, affect_vector, goal_emotion) < 0 and rollout_length < rollout_max:
-            action, modifier = _update_affect_state(random.choice(action_key_map.get_moves()), affect_vector, character_affecter)
+            action, modifier = _update_affect_state(random.choice(action_key_map.get_moves()), affect_vector, character_affecter, step_value)
 
             rollout_length += 1
             
@@ -71,9 +71,9 @@ def uct_think(root_affect_vector, action_key_map, character_affecter, goal_emoti
         
     return max(rootnode.child_nodes, key = lambda c: c.reward/c.visits).move
             
-def _update_affect_state(move, affect_vector, character_affecter):
+def _update_affect_state(move, affect_vector, character_affecter, step_value):
     action, modifier = move
-    character_affecter.update_affect(affect_vector, action, modifier)
+    character_affecter.update_affect(affect_vector, action, modifier, step_value)
     affecter.get_prevailing_affect(character_affecter, affect_vector)
     
     return(action, modifier)
