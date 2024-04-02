@@ -9,3 +9,7 @@ $ py a_star_unit_test.py ./affect_rules/test_passions_rules.json ./key_map.json 
 for rule_file_validator.py:
 
 $ py rule_file_validator.py ./affect_rules/test_passions_rules.json ./key_map.json ./affect_vector.json fear resting neutral 180 T A* <optional queue size limit argument>
+
+$ py rule_file_validator.py ./affect_rules/test_passions_rules.json ./key_map.json ./affect_vector.json fear resting neutral 180 f greedy <optional queue size limit argument>
+
+$ py rule_file_validator.py ./affect_rules/test_passions_rules.json ./key_map.json ./affect_vector.json fear resting neutral 180 T mcts <optional queue size limit argument>
