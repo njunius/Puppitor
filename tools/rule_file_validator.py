@@ -5,6 +5,7 @@ import action_key_map
 import affecter
 import npc_a_star
 import npc_greedy
+import npc_uct
 import test_helper as th
 
 # runs a test of a given rule file, key map, starting affect vector and goal emotion
@@ -58,6 +59,8 @@ def main():
         ai_mode = 0
     elif args[8] == 'greedy' or args[8] == 'Greedy' or args[8] == 'Greedy Search' or args[8] == 'Greedy search' or args[8] == 'greedy search' or args[8] == 'greedy Search':
         ai_mode = 1
+    elif args[8] == 'mcts' or args[8] == 'MCTS':
+        ai_mode = 2
         
     if len(args) == 10:
         queue_limit = int(args[9])
@@ -89,20 +92,23 @@ def main():
     action_path = []
     start_node = (character_av, action, modifier, affecter.get_prevailing_affect(character_test, character_av))
     
-    if(ai_mode == 0):
+    if ai_mode == 0:
         action_path = npc_a_star.npc_a_star_think(character_test, test_actions, start_node, goal_emotion, step_value, queue_limit, analysis = True)
-    elif(ai_mode == 1):        
+    elif ai_mode == 1:        
         action_path = th.make_greedy_path(start_node, greedy_instance, test_actions, character_test, goal_emotion, step_value)
+    elif ai_mode == 2:    
+        action_path = th.make_mcts_path(start_node, npc_uct.uct_think, test_actions, character_test, goal_emotion, step_value, 1000, 50)
 
     if not action_path:
         print('NO PATH FOUND')
         return 0
-    
+        
     response_curve = []
     if len(action_path) > 1:
         response_curve = th.find_all_affect_changes(action_path)
     else:
         response_curve.append(th.delta_info._make((0, action_path[0][3], action_path[0][3], action_path[0][3], action_path[0][1], action_path[0][2])))
+        
     with open('response_curve.csv', 'w', newline = '') as csvfile:
         response_writer = csv.writer(csvfile, delimiter = ',', quotechar = '|', quoting = csv.QUOTE_MINIMAL)
         
@@ -137,8 +143,9 @@ def main():
         end = response_curve[-1]
         response_writer.writerow([len(action_path), end.init_affect, end.curr_affect, end.curr_affect, end.curr_action, end.curr_mod]) # add the last step to the file
             
-    th.apply_print_path(action_path, character_test, character_av, step_value, verbose)    
-    print('\nfinal affect vector: ', character_av)
+    if verbose:
+        th.verbose_print(action_path)    
+    print('\nfinal affect vector: ', action_path[-1][0])
 
     return 0
     
