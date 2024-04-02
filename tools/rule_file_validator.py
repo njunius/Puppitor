@@ -142,10 +142,11 @@ def main():
         
         end = response_curve[-1]
         response_writer.writerow([len(action_path), end.init_affect, end.curr_affect, end.curr_affect, end.curr_action, end.curr_mod]) # add the last step to the file
-            
+    
+    # prints the full path if in verbose mode
     if verbose:
         th.verbose_print(action_path)    
-    print('\nfinal affect vector: ', action_path[-1][0])
+    print('\nfinal affect vector: ', action_path[-1][0]) # get the last node's affect vector
 
     return 0
     

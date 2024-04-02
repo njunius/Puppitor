@@ -165,6 +165,18 @@ def make_greedy_path(start, greedy_search, key_map, char_affecter, goal_emotion,
         
     return result_path
     
+# returns a list of each move made by the uct_think function
+# start is the initial state for the MCTS function to start from
+# start is formatted just like an A* node:
+#   - node[0] = affect_vector
+#   - node[1] = action
+#   - node[2] = modifier
+#   - node[3] = prevailing affect
+# key_map is a Puppitor action_key_map corresponding to the one used to create edges for MCTS nodes
+# char_affecter is the affecter of the character whose rules will be used as the search domain
+# step_value controls the size of the moves MCTS makes
+# itermax is the maximum number of iterations MCTS is allowed when building the game tree
+# rollout_max is the maximum number of simulated moves MCTS is allowed to make
 def make_mcts_path(start, uct_think, key_map, char_affecter, goal_emotion, step_value, itermax = 2000, rollout_max = 50):
     result_path = []
     
