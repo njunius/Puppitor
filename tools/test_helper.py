@@ -108,7 +108,6 @@ def find_all_affect_changes(path):
 def set_up_path(start, result_path):
     result_path = []
     start_node = (tuple(start[0].items()), start[1], start[2], start[3])
-    print(start_node)
     result_path.append(start_node)
     
     return result_path
@@ -117,7 +116,6 @@ def set_up_path(start, result_path):
 def make_path_seg(result_path, char_affecter, action, mod, step_value):
     
     start_path_seg = result_path[-1] # build this next segment of the path starting from the end of the current path
-    print(start_path_seg)
     index_av = dict(start_path_seg[0]) # unwrap the tuple back into a mutable affect vector
     
     for i in range(0, step_value):
