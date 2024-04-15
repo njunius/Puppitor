@@ -58,8 +58,8 @@
             "resting" : 0.0001
         },
         "modifiers" : {
-            "tempo_up" : 1.12,
-            "tempo_down" : 0.7,
+            "tempo_up" : 0.7,
+            "tempo_down" : 1.12,
             "neutral" : 1.0
         },
         "adjacent_affects" : {
