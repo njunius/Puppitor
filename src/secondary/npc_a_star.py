@@ -133,11 +133,12 @@ def npc_a_star_think(character_affecter, action_key_map, start, goal_emotion, st
         # check every adjacent node of the current node and if it is a new node or a more efficient way to get to next_node, add it to the frontier
         for next in _puppitor_adjacencies(character_affecter, action_key_map, curr_node[0], goal_emotion, step_multiplier):
             next_cost, next_node = next
-            new_cost = cost_so_far[curr_node] + next_cost + _heuristic(next_node[3], dict(next_node[0]), goal_emotion)
+            new_cost = cost_so_far[curr_node] + next_cost
             
             if next_node not in cost_so_far or new_cost < cost_so_far[next_node]:
                 cost_so_far[next_node] = new_cost
-                heappush(frontier, (new_cost, next_node))
+                priority = new_cost + _heuristic(next_node[3], dict(next_node[0]), goal_emotion)
+                heappush(frontier, (priority, next_node))
                 prev_node[next_node] = curr_node
               
     print('NO PATH FOUND WITHIN QUEUE SIZE LIMITS')
